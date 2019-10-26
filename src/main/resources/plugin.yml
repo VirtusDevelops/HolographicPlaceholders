@@ -1,0 +1,25 @@
+name: HolographicPlaceholders
+main: com.neutralplasma.holographicPlaceholders.HolographicPlaceholders
+version: @version@
+api-version: 1.13
+author: NeutralPlasma
+
+depend:
+  - Vault
+  - HolographicDisplays
+
+softdepend:
+  - PlaceholderAPI
+
+commands:
+  hpe:
+    permission: holographicplaceholders.command.main
+    usage: /<command>
+
+permissions:
+  holographicplaceholders.command.main:
+    default: op
+    description: Main permission.
+  holographicplaceholders.command.reload:
+    default: op
+    description: Reload permission.
