@@ -24,6 +24,8 @@ public class BalTopAddon extends Addon {
     private List<String> balplaceholders = new ArrayList<>();
     private List<String> userplaceholders = new ArrayList<>();
 
+    private static Map<UUID, Double> playersBalancesStatic = new HashMap<>();
+
     // tasks
     private BukkitTask balanceRegister;
     private BukkitTask balanceUpdater;
@@ -49,6 +51,7 @@ public class BalTopAddon extends Addon {
     public void onDisable() {
         unregisterPlaceholders();
         stopBaltop();
+        super.onDisable();
     }
 
     public void registerAllBalances() {
@@ -65,7 +68,14 @@ public class BalTopAddon extends Addon {
 
             }
         }.runTaskAsynchronously(holographicPlaceholders);
+        playersBalancesStatic = playersBalances;
     }
+    // =================================================================================================================
+
+    public static Map<UUID, Double> getPlayers(){
+        return playersBalancesStatic;
+    }
+
     public void onlineBalanceUpdater() { // Registers all users offline and online every some time(delay in config)
         long delay = holographicPlaceholders.getConfig().getLong("BalTop.delay");
         balanceUpdater = new BukkitRunnable() {
@@ -173,11 +183,8 @@ public class BalTopAddon extends Addon {
     public boolean stopBaltop(){
         try{
             balanceUpdater.cancel();
-            Bukkit.getConsoleSender().sendMessage(TextFormater.sFormatText("&8[&6HBT&8]&7 Stopping balance updater."));
             balanceRegister.cancel();
-            Bukkit.getConsoleSender().sendMessage(TextFormater.sFormatText("&8[&6HBT&8]&7 Stopping registerer updater."));
             offlineUpdater.cancel();
-            Bukkit.getConsoleSender().sendMessage(TextFormater.sFormatText("&8[&6HBT&8]&7 Stopping offline updater."));
             return true;
         }catch (Exception error) {
             return false;
@@ -187,11 +194,8 @@ public class BalTopAddon extends Addon {
     public boolean startBaltop(){
         try{
             registerAllBalances();
-            Bukkit.getConsoleSender().sendMessage(TextFormater.sFormatText("&8[&6HBT&8]&7 Registering balances."));
             onlineBalanceUpdater();
-            Bukkit.getConsoleSender().sendMessage(TextFormater.sFormatText("&8[&6HBT&8]&7 Starting balance updater."));
             offlineBalanceUpdater();
-            Bukkit.getConsoleSender().sendMessage(TextFormater.sFormatText("&8[&6HBT&8]&7 Starting offline balance updater."));
             return true;
         }catch (Exception error){
             return false;

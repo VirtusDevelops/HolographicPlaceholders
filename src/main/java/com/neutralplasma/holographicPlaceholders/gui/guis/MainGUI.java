@@ -7,6 +7,7 @@ import com.neutralplasma.holographicPlaceholders.gui.Icon;
 import com.neutralplasma.holographicPlaceholders.gui.InventoryCreator;
 import com.neutralplasma.holographicPlaceholders.gui.actions.ClickAction;
 import com.neutralplasma.holographicPlaceholders.gui.actions.LeftClickAction;
+import com.neutralplasma.holographicPlaceholders.gui.actions.RightClickAction;
 import com.neutralplasma.holographicPlaceholders.utils.TextFormater;
 import com.neutralplasma.holographicPlaceholders.utils.XMaterial;
 import org.bukkit.entity.Player;
@@ -39,13 +40,14 @@ public class MainGUI {
     private void setupAddons(){
         int itempos = 10;
         for(Addon addon : holographicPlaceholders.getAddons().keySet()){
-            String addonName = holographicPlaceholders.getAddons().get(addon);
             ItemStack item = XMaterial.BOOK.parseItem();
             ItemMeta itemMeta = item.getItemMeta();
-            itemMeta.setDisplayName(TextFormater.sFormatText("&e" + addonName));
+            itemMeta.setDisplayName(TextFormater.sFormatText("&e" + addon.getName()));
             List<String> lore = new ArrayList<>();
+            lore.add(TextFormater.sFormatText("&7"));
             lore.add(TextFormater.sFormatText("&7R-Click to edit."));
             lore.add(TextFormater.sFormatText("&7L-Click to &aEnable&7/&cDisable."));
+            lore.add(TextFormater.sFormatText("&7"));
             if(addon.isEnabled()) {
                 lore.add(TextFormater.sFormatText("&7Currently: &aEnabled"));
             }else{
@@ -57,7 +59,7 @@ public class MainGUI {
             icon.addLeftClickAction(new LeftClickAction() {
                 @Override
                 public void execute(Player player) {
-                    holographicPlaceholders.getConfig().set("addons." + addonName, !addon.isEnabled());
+                    holographicPlaceholders.getConfig().set("addons." + addon.getName(), !addon.isEnabled());
                     holographicPlaceholders.saveConfig();
                     if(addon.isEnabled()){
                         holographicPlaceholders.disableAddon(addon);
@@ -67,7 +69,14 @@ public class MainGUI {
                     handler.openMainGUI(player);
                 }
             });
-
+            icon.addRightClickAction(new RightClickAction() {
+                @Override
+                public void execute(Player player) {
+                    if(addon.isEnabled()){
+                        handler.openAddonGUI(addon, player);
+                    }
+                }
+            });
             items.add(itempos);
             ic.setIcon(itempos, icon);
             if(itempos == 16){

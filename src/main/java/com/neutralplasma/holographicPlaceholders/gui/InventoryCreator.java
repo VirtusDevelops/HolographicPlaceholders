@@ -61,6 +61,12 @@ public class InventoryCreator implements InventoryHolder {
         return this;
     }
 
+    public InventoryCreator clearCloseActions(){
+        this.closeActionList.clear();
+        return this;
+    }
+
+
     public List<InventoryCloseAction> getCloseActions() {
         return this.closeActionList;
     }

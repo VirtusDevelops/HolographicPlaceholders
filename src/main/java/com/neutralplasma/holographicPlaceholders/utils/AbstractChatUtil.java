@@ -1,6 +1,7 @@
 package com.neutralplasma.holographicPlaceholders.utils;
 
 import com.neutralplasma.holographicPlaceholders.HolographicPlaceholders;
+import com.neutralplasma.holographicPlaceholders.gui.Handler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

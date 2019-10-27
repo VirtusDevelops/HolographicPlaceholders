@@ -17,8 +17,8 @@ public class ReloadCommand implements CommandInterface {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
         if(sender.hasPermission("holographicplaceholders.command.reload")){
-            holographicPlaceholders.reload();
-            sender.sendMessage(TextFormater.sFormatText("&7Successfully reloaded!"));
+            long time = holographicPlaceholders.reload();
+            sender.sendMessage(TextFormater.sFormatText("&7Successfully reloaded! Took: &e" + time + "ms&7."));
             return true;
         }else{
             sender.sendMessage(TextFormater.sFormatText("&cSorry but you do not have permission to execute this command."));
