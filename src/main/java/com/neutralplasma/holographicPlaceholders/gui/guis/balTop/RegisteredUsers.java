@@ -7,6 +7,7 @@ import com.neutralplasma.holographicPlaceholders.gui.Icon;
 import com.neutralplasma.holographicPlaceholders.gui.InventoryCreator;
 import com.neutralplasma.holographicPlaceholders.gui.actions.ClickAction;
 import com.neutralplasma.holographicPlaceholders.gui.actions.InventoryCloseAction;
+import com.neutralplasma.holographicPlaceholders.utils.BalanceFormater;
 import com.neutralplasma.holographicPlaceholders.utils.TextFormater;
 import com.neutralplasma.holographicPlaceholders.utils.XMaterial;
 import org.bukkit.Bukkit;
@@ -64,6 +65,10 @@ public class RegisteredUsers {
                 meta.setOwningPlayer(oPlayer);
                 item.setItemMeta(meta);
                 ItemMeta itemMeta = item.getItemMeta();
+                List<String> lore = new ArrayList<>();
+                lore.add(TextFormater.sFormatText("&7"));
+                lore.add(TextFormater.sFormatText("&7Balance: &e" + holographicPlaceholders.getEconomy().getBalance(oPlayer)));
+                itemMeta.setLore(lore);
                 itemMeta.setDisplayName(TextFormater.sFormatText("&e" + oPlayer.getName()));
                 item.setItemMeta(itemMeta);
                 users.add(item);

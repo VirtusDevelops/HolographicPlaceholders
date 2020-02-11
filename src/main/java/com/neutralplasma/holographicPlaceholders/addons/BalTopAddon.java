@@ -4,7 +4,6 @@ import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.gmail.filoghost.holographicdisplays.api.placeholder.PlaceholderReplacer;
 import com.neutralplasma.holographicPlaceholders.HolographicPlaceholders;
 import com.neutralplasma.holographicPlaceholders.utils.BalanceFormater;
-import com.neutralplasma.holographicPlaceholders.utils.TextFormater;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -85,7 +84,7 @@ public class BalTopAddon extends Addon {
                         double playerbalance;
                         try {
                             playerbalance = holographicPlaceholders.getEconomy().getBalance(player);
-                        }catch (NullPointerException error){
+                        }catch (Exception error){
                             playerbalance = 0.0;
                         }
                         UUID playersuuid = player.getUniqueId();
@@ -105,9 +104,14 @@ public class BalTopAddon extends Addon {
             public void run() {
                 for(OfflinePlayer player : Bukkit.getOfflinePlayers()){
                     if(!(excludedPlayers.contains(player.getName()))){
-                        double playerbalance = holographicPlaceholders.getEconomy().getBalance(player);
-                        UUID playersuuid = player.getUniqueId();
-                        playersBalances.put(playersuuid, playerbalance);
+                            double playerbalance;
+                            try {
+                                playerbalance = holographicPlaceholders.getEconomy().getBalance(player);
+                            }catch (Exception error){
+                                playerbalance = 0D;
+                            }
+                            UUID playersuuid = player.getUniqueId();
+                            playersBalances.put(playersuuid, playerbalance);
                     }
                 }
 

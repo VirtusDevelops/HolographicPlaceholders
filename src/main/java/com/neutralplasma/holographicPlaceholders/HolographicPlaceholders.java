@@ -2,6 +2,7 @@ package com.neutralplasma.holographicPlaceholders;
 
 import com.neutralplasma.holographicPlaceholders.addons.Addon;
 import com.neutralplasma.holographicPlaceholders.addons.BalTopAddon;
+
 import com.neutralplasma.holographicPlaceholders.addons.PlaceholderAPI;
 import com.neutralplasma.holographicPlaceholders.addons.protocolLib.ProtocolHook;
 import com.neutralplasma.holographicPlaceholders.commands.CommandHandler;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class HolographicPlaceholders extends JavaPlugin {
 
@@ -82,16 +84,16 @@ public class HolographicPlaceholders extends JavaPlugin {
         protocolAddon.setName("ProtocolLib");
         placeholderAddon.setName("PlaceholderAPI");
 
-        addons.put(baltopAddon, "BalTop");
-        addons.put(protocolAddon, "ProtocolLib");
-        addons.put(placeholderAddon, "PlaceholderAPI");
+        addons.put(baltopAddon, baltopAddon.getName());
+        addons.put(protocolAddon, protocolAddon.getName());
+        addons.put(placeholderAddon, placeholderAddon.getName());
 
-        for(Addon addon : addons.keySet()){
-            if(this.getConfig().getBoolean("addons." + addons.get(addon))) {
-                if(!addon.isEnabled()) {
+        for(Addon addon : addons.keySet()) {
+            if (this.getConfig().getBoolean("addons." + addons.get(addon))) {
+                if (!addon.isEnabled()) {
                     addon.onEnable();
                     Bukkit.getConsoleSender().sendMessage(TextFormater.sFormatText("&8[&eHPE&8] &7Enabled: &e" + addon.getName()));
-                    if(addon.getName().equals("ProtocolLib")) {
+                    if (addon.getName().equals("ProtocolLib")) {
                         metrics.addCustomChart(new Metrics.SimplePie("protocollib_enabled", () -> "True"));
                     }
                 }
