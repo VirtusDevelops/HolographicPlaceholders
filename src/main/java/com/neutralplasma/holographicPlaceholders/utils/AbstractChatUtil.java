@@ -1,7 +1,6 @@
 package com.neutralplasma.holographicPlaceholders.utils;
 
 import com.neutralplasma.holographicPlaceholders.HolographicPlaceholders;
-import com.neutralplasma.holographicPlaceholders.gui.Handler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,7 +21,6 @@ import java.util.UUID;
 
 public class AbstractChatUtil implements Listener {
 
-    private static HolographicPlaceholders holographicPlaceholders;
 
     private static final List<UUID> registered = new ArrayList<>();
 

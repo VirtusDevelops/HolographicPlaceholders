@@ -1,7 +1,6 @@
 package com.neutralplasma.holographicPlaceholders.gui.guis.balTop;
 
 import com.neutralplasma.holographicPlaceholders.HolographicPlaceholders;
-import com.neutralplasma.holographicPlaceholders.addons.Addon;
 import com.neutralplasma.holographicPlaceholders.gui.Handler;
 import com.neutralplasma.holographicPlaceholders.gui.Icon;
 import com.neutralplasma.holographicPlaceholders.gui.InventoryCreator;

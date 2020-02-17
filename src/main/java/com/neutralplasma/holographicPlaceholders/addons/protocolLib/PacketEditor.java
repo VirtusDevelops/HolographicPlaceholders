@@ -7,7 +7,6 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 
-import com.neutralplasma.holographicPlaceholders.addons.Addon;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -20,7 +19,7 @@ public class PacketEditor extends PacketAdapter{
     public PacketEditor(final AdapterParameteters params){
         super(params);
         final String version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
-        if (version.equals("v1_13_R1") || version.equals("v1_13_R2") || version.equals("v1_14_R1")) {
+        if (version.equals("v1_13_R1") || version.equals("v1_13_R2") || version.equals("v1_14_R1") || version.equals("v1_15_R1")) {
             this.useOptional = true;
         }
     }
@@ -68,6 +67,7 @@ public class PacketEditor extends PacketAdapter{
             newName = (String)customNameWatchableObjectValue;
         }
         newName = PlaceholderAPI.setPlaceholders(player, newName);
+
         if (this.useOptional) {
             customNameWatchableObject.setValue(Optional.of(WrappedChatComponent.fromJson(newName).getHandle()));
         } else {
