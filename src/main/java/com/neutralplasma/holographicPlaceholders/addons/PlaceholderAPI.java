@@ -39,15 +39,15 @@ public class PlaceholderAPI extends Addon {
 
     public void registerPapiPlaceholders(){
         for(int index = 0; index < placeholders.size(); index++){
-            String unformatedPlaceholder = placeholders.get(index).toString();
-            placeholder = placeholders.get(index).toString();
+            String unformatedPlaceholder = placeholders.get(index);
+            placeholder = placeholders.get(index);
             long delay = holographicPlaceholders.getConfig().getLong("placeholderAPI.delay");
             int i = index;
 
             HologramsAPI.registerPlaceholder(holographicPlaceholders, unformatedPlaceholder, delay, new PlaceholderReplacer() {
                 @Override
                 public String update() {
-                    placeholder = placeholders.get(i).toString();
+                    placeholder = placeholders.get(i);
                     placeholder = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(null, placeholder);
                     return placeholder;
                 }

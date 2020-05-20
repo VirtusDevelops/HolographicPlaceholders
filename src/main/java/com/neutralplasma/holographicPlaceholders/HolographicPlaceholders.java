@@ -1,9 +1,11 @@
 package com.neutralplasma.holographicPlaceholders;
 
 import com.neutralplasma.holographicPlaceholders.addons.Addon;
-import com.neutralplasma.holographicPlaceholders.addons.BalTopAddon;
+import com.neutralplasma.holographicPlaceholders.addons.baltop.BalTopAddon;
 
 import com.neutralplasma.holographicPlaceholders.addons.PlaceholderAPI;
+import com.neutralplasma.holographicPlaceholders.addons.PapiAddon;
+import com.neutralplasma.holographicPlaceholders.addons.playTime.PlayTimeAddon;
 import com.neutralplasma.holographicPlaceholders.addons.protocolLib.ProtocolHook;
 import com.neutralplasma.holographicPlaceholders.commands.CommandHandler;
 import com.neutralplasma.holographicPlaceholders.commands.MainCommand;
@@ -13,6 +15,7 @@ import com.neutralplasma.holographicPlaceholders.events.CloseInventoryEvent;
 import com.neutralplasma.holographicPlaceholders.events.InventoryOpenEvent;
 import com.neutralplasma.holographicPlaceholders.events.OnClickEvent;
 import com.neutralplasma.holographicPlaceholders.gui.Handler;
+import com.neutralplasma.holographicPlaceholders.storage.DataStorage;
 import com.neutralplasma.holographicPlaceholders.utils.*;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -25,12 +28,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 public class HolographicPlaceholders extends JavaPlugin {
 
     private BalanceFormater balanceFormater;
     private ConfigUtil configUtil;
+    private DataStorage dataStorage;
     Metrics metrics;
 
     Handler handler;
@@ -44,6 +47,8 @@ public class HolographicPlaceholders extends JavaPlugin {
         long time = System.currentTimeMillis();
         metrics = new Metrics(this);
         configUtil = new ConfigUtil(this);
+        this.dataStorage = new DataStorage(this);
+        dataStorage.setup();
         setupConfig();
         setupEconomy();
         balanceFormater = new BalanceFormater();
@@ -57,6 +62,7 @@ public class HolographicPlaceholders extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        dataStorage.saveData();
         unregisterAddons();
         super.onDisable();
     }
@@ -76,17 +82,20 @@ public class HolographicPlaceholders extends JavaPlugin {
 
     public void registerAddons(){
         List<Addon> toRemove = new ArrayList<>();
-        Addon baltopAddon = new BalTopAddon(this, balanceFormater);
+        BalTopAddon baltopAddon = new BalTopAddon(this, balanceFormater);
         Addon protocolAddon = new ProtocolHook(this);
         Addon placeholderAddon = new PlaceholderAPI(this);
+        PlayTimeAddon playTimeAddon = new PlayTimeAddon(this, dataStorage);
 
         baltopAddon.setName("BalTop");
         protocolAddon.setName("ProtocolLib");
         placeholderAddon.setName("PlaceholderAPI");
+        playTimeAddon.setName("PlayTime");
 
         addons.put(baltopAddon, baltopAddon.getName());
         addons.put(protocolAddon, protocolAddon.getName());
         addons.put(placeholderAddon, placeholderAddon.getName());
+        addons.put(playTimeAddon, placeholderAddon.getName());
 
         for(Addon addon : addons.keySet()) {
             if (this.getConfig().getBoolean("addons." + addons.get(addon))) {
@@ -97,6 +106,11 @@ public class HolographicPlaceholders extends JavaPlugin {
                         metrics.addCustomChart(new Metrics.SimplePie("protocollib_enabled", () -> "True"));
                     }
                 }
+            }
+        }
+        if(baltopAddon.isEnabled() && placeholderAddon.isEnabled()){
+            if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null){
+                new PapiAddon(this, baltopAddon, playTimeAddon).register();
             }
         }
     }

@@ -1,9 +1,12 @@
-package com.neutralplasma.holographicPlaceholders.addons;
+package com.neutralplasma.holographicPlaceholders.addons.baltop;
 
+import com.comphenix.protocol.PacketType;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.gmail.filoghost.holographicdisplays.api.placeholder.PlaceholderReplacer;
 import com.neutralplasma.holographicPlaceholders.HolographicPlaceholders;
+import com.neutralplasma.holographicPlaceholders.addons.Addon;
 import com.neutralplasma.holographicPlaceholders.utils.BalanceFormater;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -121,12 +124,10 @@ public class BalTopAddon extends Addon {
 
     //------------------------------------------------------------------------------------------------------------------
     public LinkedHashMap getBalancesUsers(){
-        int size = holographicPlaceholders.getConfig().getInt("BalTop.size");
         return playersBalances
                 .entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .limit(size)
                 .collect(Collectors.toMap(
                         Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }
@@ -245,6 +246,15 @@ public class BalTopAddon extends Addon {
                         }
                     });
         }
+    }
+
+    public int getPlayerPosition(Player player){
+        for(int i : orderedPlayers.keySet()){
+            if(orderedPlayers.get(i).toString().equals(player.getUniqueId().toString())){
+                return i + 1;
+            }
+        }
+        return 0;
     }
 
     public void unregisterPlaceholders(){

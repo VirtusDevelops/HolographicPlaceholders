@@ -1,13 +1,12 @@
 package com.neutralplasma.holographicPlaceholders.gui.guis.balTop;
 
 import com.neutralplasma.holographicPlaceholders.HolographicPlaceholders;
-import com.neutralplasma.holographicPlaceholders.addons.BalTopAddon;
+import com.neutralplasma.holographicPlaceholders.addons.baltop.BalTopAddon;
 import com.neutralplasma.holographicPlaceholders.gui.Handler;
 import com.neutralplasma.holographicPlaceholders.gui.Icon;
 import com.neutralplasma.holographicPlaceholders.gui.InventoryCreator;
 import com.neutralplasma.holographicPlaceholders.gui.actions.ClickAction;
 import com.neutralplasma.holographicPlaceholders.gui.actions.InventoryCloseAction;
-import com.neutralplasma.holographicPlaceholders.utils.BalanceFormater;
 import com.neutralplasma.holographicPlaceholders.utils.TextFormater;
 import com.neutralplasma.holographicPlaceholders.utils.XMaterial;
 import org.bukkit.Bukkit;

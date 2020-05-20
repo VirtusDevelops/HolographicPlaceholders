@@ -1,6 +1,7 @@
 package com.neutralplasma.holographicPlaceholders.addons.protocolLib;
 
 import com.gmail.filoghost.holographicdisplays.api.placeholder.PlaceholderReplacer;
+import com.neutralplasma.holographicPlaceholders.utils.TextFormater;
 import org.bukkit.Bukkit;
 
 import java.util.List;
@@ -23,6 +24,6 @@ public class TimePlaceholdersUpdater implements PlaceholderReplacer {
         else {
             this.indexCurrent++;
         }
-        return currentFrame;
+        return TextFormater.sFormatText(currentFrame);
     }
 }

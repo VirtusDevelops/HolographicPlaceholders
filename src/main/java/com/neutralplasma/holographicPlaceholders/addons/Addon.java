@@ -2,7 +2,7 @@ package com.neutralplasma.holographicPlaceholders.addons;
 
 public abstract class Addon {
 
-    private String name = "none";
+    public String name = "none";
 
     private boolean isEnabled = false;
 

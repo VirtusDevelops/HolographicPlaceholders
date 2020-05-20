@@ -19,7 +19,7 @@ public class PacketEditor extends PacketAdapter{
     public PacketEditor(final AdapterParameteters params){
         super(params);
         final String version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
-        if (version.equals("v1_13_R1") || version.equals("v1_13_R2") || version.equals("v1_14_R1") || version.equals("v1_15_R1")) {
+        if (version.contains("v1_13") || version.contains("v1_13") || version.contains("v1_14") || version.contains("v1_15")) {
             this.useOptional = true;
         }
     }

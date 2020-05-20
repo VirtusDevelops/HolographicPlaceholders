@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'SimplePlaceholder'
-version '2.0.3 Beta'
+version '2.0.4 Beta'
 
 sourceCompatibility = 1.8
 
@@ -17,6 +17,9 @@ repositories {
         name = 'placeholderapi'
         url = 'http://repo.extendedclip.com/content/repositories/placeholderapi/'
     }
+    maven {
+        url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/'
+    }
     maven { url 'https://jitpack.io' }
     mavenLocal()
 }
@@ -24,11 +27,11 @@ repositories {
 dependencies {
     implementation group: 'junit', name: 'junit', version: '4.12'
     implementation 'me.clip:placeholderapi:2.10.4'
-    compile group: 'com.zaxxer', name: 'HikariCP', version: '3.3.1'
     implementation group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.5.0";
     implementation group: 'org.spigotmc', name: 'spigot', version: '1.15.2-R0.1-SNAPSHOT'
     implementation group: 'org.spigotmc', name: 'spigot', version: '1.14.2-R0.1-SNAPSHOT'
     implementation group: 'org.spigotmc', name: 'spigot', version: '1.12.2-R0.1-SNAPSHOT'
+    implementation 'me.clip:placeholderapi:v2.10.5'
     implementation files('libs/HolographicDisplays.jar')
     implementation "com.github.MilkBowl:VaultAPI:1.7"
 }

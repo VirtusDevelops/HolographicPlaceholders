@@ -4,13 +4,9 @@ version: @version@
 api-version: "1.13"
 author: NeutralPlasma
 
-depend:
-  - Vault
-  - HolographicDisplays
+depend: [Vault, HolographicDisplays]
 
-softdepend:
-  - PlaceholderAPI
-  - Stats
+softdepend: [PlaceholderAPI]
 
 commands:
   hpe:
