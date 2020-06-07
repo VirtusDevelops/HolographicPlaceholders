@@ -19,7 +19,7 @@ public class PacketEditor extends PacketAdapter{
     public PacketEditor(final AdapterParameteters params){
         super(params);
         final String version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
-        if (version.contains("v1_13") || version.contains("v1_13") || version.contains("v1_14") || version.contains("v1_15")) {
+        if (version.contains("v1_13") || version.contains("v1_14") || version.contains("v1_15")) {
             this.useOptional = true;
         }
     }
@@ -35,7 +35,7 @@ public class PacketEditor extends PacketAdapter{
                 final List<WrappedWatchableObject> dataWatcherValues = entityMetadataPacket.getMetadata();
                 for (final WrappedWatchableObject watchableObject : dataWatcherValues) {
                     if (watchableObject.getIndex() == 2) {
-                        if (getPlaceholders(watchableObject, event.getPlayer())) {
+                        if (updateText(watchableObject, event.getPlayer())) {
                             event.setPacket(entityMetadataPacket.getHandle());
                         }
                     }
@@ -46,7 +46,7 @@ public class PacketEditor extends PacketAdapter{
         }
     }
 
-    public boolean getPlaceholders(WrappedWatchableObject customNameWatchableObject, Player player){
+    public boolean updateText(WrappedWatchableObject customNameWatchableObject, Player player){
         if (customNameWatchableObject == null) {
             return true;
         }

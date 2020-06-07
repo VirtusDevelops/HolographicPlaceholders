@@ -56,22 +56,20 @@ public class RegisteredUsers {
     }
 
     public void registeredUsers(){
-        for(UUID uuid : BalTopAddon.getPlayers().keySet()){
-            OfflinePlayer oPlayer = Bukkit.getOfflinePlayer(uuid);
-            if(oPlayer != null){
-                ItemStack item = XMaterial.PLAYER_HEAD.parseItem();
-                SkullMeta meta = (SkullMeta) item.getItemMeta();
-                meta.setOwningPlayer(oPlayer);
-                item.setItemMeta(meta);
-                ItemMeta itemMeta = item.getItemMeta();
-                List<String> lore = new ArrayList<>();
-                lore.add(TextFormater.sFormatText("&7"));
-                lore.add(TextFormater.sFormatText("&7Balance: &e" + holographicPlaceholders.getEconomy().getBalance(oPlayer)));
-                itemMeta.setLore(lore);
-                itemMeta.setDisplayName(TextFormater.sFormatText("&e" + oPlayer.getName()));
-                item.setItemMeta(itemMeta);
-                users.add(item);
-            }
+        for(String username : BalTopAddon.getPlayers().keySet()){
+            OfflinePlayer oPlayer = Bukkit.getOfflinePlayer(username);
+            ItemStack item = XMaterial.PLAYER_HEAD.parseItem();
+            SkullMeta meta = (SkullMeta) item.getItemMeta();
+            meta.setOwningPlayer(oPlayer);
+            item.setItemMeta(meta);
+            ItemMeta itemMeta = item.getItemMeta();
+            List<String> lore = new ArrayList<>();
+            lore.add(TextFormater.sFormatText("&7"));
+            lore.add(TextFormater.sFormatText("&7Balance: &e" + holographicPlaceholders.getEconomy().getBalance(oPlayer)));
+            itemMeta.setLore(lore);
+            itemMeta.setDisplayName(TextFormater.sFormatText("&e" + oPlayer.getName()));
+            item.setItemMeta(itemMeta);
+            users.add(item);
         }
 
         // Intializes pages for seeds

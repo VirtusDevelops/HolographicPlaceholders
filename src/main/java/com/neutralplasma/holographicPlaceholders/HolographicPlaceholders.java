@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+
 
 public class HolographicPlaceholders extends JavaPlugin {
 
@@ -39,6 +41,7 @@ public class HolographicPlaceholders extends JavaPlugin {
     Handler handler;
     private Map<Addon, String> addons = new HashMap<>();
     private static Economy econ = null;
+
 
     @Override
     public void onEnable() {
@@ -57,6 +60,7 @@ public class HolographicPlaceholders extends JavaPlugin {
         setupGui();
         registerCommands();
         time = (time - System.currentTimeMillis())*-1;
+        this.getLogger().setLevel(Level.INFO);
         sender.sendMessage(TextFormater.sFormatText("&e=================[ &7Done: &e" + time + "&7ms &e]================="));
     }
 

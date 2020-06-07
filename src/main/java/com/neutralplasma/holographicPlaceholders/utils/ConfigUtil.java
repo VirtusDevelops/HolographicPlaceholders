@@ -48,7 +48,7 @@ public class ConfigUtil {
         excludedusers.add("name2");
         excludedusers.add("name3");
         config.set("BalTop.excluded-users", excludedusers);
-        config.set("config-version", 2.2);
+        config.set("config-version", 2.3);
         holographicPlaceholders.saveConfig();
     }
 }
