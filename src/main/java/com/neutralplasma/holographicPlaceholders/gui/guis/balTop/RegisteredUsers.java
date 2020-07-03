@@ -41,7 +41,7 @@ public class RegisteredUsers {
         users.clear();
         usersMap.clear();
         currentpage = page;
-        registeredUsers();
+        //registeredUsers();
         createUserIcons(page);
         prevPage();
         nextPage();
@@ -54,7 +54,7 @@ public class RegisteredUsers {
         });
         player.openInventory(ic.getInventory());
     }
-
+    /*
     public void registeredUsers(){
         for(String username : BalTopAddon.getPlayers().keySet()){
             OfflinePlayer oPlayer = Bukkit.getOfflinePlayer(username);
@@ -82,6 +82,8 @@ public class RegisteredUsers {
             usersMap.put(users.get(x), page);
         }
     }
+
+     */
 
     public void createUserIcons(int page){
         int itempos = 10;

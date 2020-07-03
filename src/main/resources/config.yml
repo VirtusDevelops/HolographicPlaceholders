@@ -7,9 +7,58 @@
 # Discord server: https://discord.gg/Zpks2WK
 #
 
-config-version: 1
+config-version: 0
 
-addons: []
+addons:
+  BalTop: true
+  ProtocolLib: true
+  PlaceholderAPI: true
+  BalTopPremium: false
+  PlayTime: false
+  MultiPlaceholders: true
+
+placeholder-addons:
+  "%statistic_deaths%":
+     size: 10
+     interval: 200.0
+     value: "number"
+     format: 1
+     signs: true
+     heads: true
+
+placeholderAPI:
+  delay: 1.0
+  placeholders:
+    - '%server_name%'
 
 
+BalTop: # Uses names
+  delay: 200.0
+  placeholder-delay: 10.0
+  offline-delay: 800.0
+  size: 10
+  format: 3
+  excluded-users:
+    - name1
+    - name2
+    - name3
 
+PlayTime:
+  update-delay: 4000.0
+  placeholder-delay: 200.0
+  size: 20
+  excluded-users:
+    - name1
+    - name2
+    - name3
+
+BalTopPremium: # Uses UUIDs
+  delay: 200.0
+  placeholder-delay: 10.0
+  offline-delay: 800.0
+  size: 10
+  format: 3
+  excluded-users:
+    - name1
+    - name2
+    - name3

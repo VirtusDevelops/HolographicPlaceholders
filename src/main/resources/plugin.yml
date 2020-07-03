@@ -20,3 +20,15 @@ permissions:
   holographicplaceholders.command.reload:
     default: op
     description: Reload permission.
+  holographicplaceholders.command.setsign:
+    default: op
+    description: Set sign permission.
+  holographicplaceholders.command.sethead:
+    default: op
+    description: Set head permission.
+  holographicplaceholders.command.removehead:
+    default: op
+    description: Remove head permission.
+  holographicplaceholders.command.removesign:
+    default: op
+    description: Remove sign permission.

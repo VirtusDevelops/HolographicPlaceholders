@@ -4,7 +4,7 @@ import java.text.DecimalFormat;
 
 public class BalanceFormater {
 
-    public String formatDecimals(Double number){
+    public static String formatDecimals(Double number){
         DecimalFormat dformater = new DecimalFormat("###.##");
 
         String formated = dformater.format(number);
@@ -13,7 +13,7 @@ public class BalanceFormater {
 
     }
 
-    public String formatNumbers(Double number){
+    public static String formatNumbers(Double number){
         DecimalFormat dformater = new DecimalFormat("###,###,###,###.###");
 
         String formated = dformater.format(number);
@@ -22,7 +22,7 @@ public class BalanceFormater {
 
     }
 
-    public String formatNames(Double number){
+    public static String formatNames(Double number){
         char[] suffix = {' ', 'k', 'M', 'B', 'T', 'P', 'E'};
         double numValue = number.doubleValue();
         int value = (int) Math.floor(Math.log10(numValue));
@@ -32,6 +32,15 @@ public class BalanceFormater {
         } else {
             return new DecimalFormat("#,###.##").format(numValue);
         }
+    }
+
+    public static String formatValue(int format, double value){
+        switch(format){
+            case 1: return formatDecimals(value);
+            case 2: return formatNumbers(value);
+            case 3: return formatNames(value);
+        }
+        return "";
     }
 
     public String formatDecimalsLong(Long number){

@@ -18,15 +18,15 @@ import java.util.stream.Collectors;
         TODO:
          - ADD SIGNS
      */
-public class BalTopAddon extends Addon {
+public class BalTopAddonV2 extends Addon {
 
     private HolographicPlaceholders holographicPlaceholders;
-    private HashMap<String, Double> playersBalances = new HashMap<>();
-    private HashMap<String, Double> sorted = new HashMap<>();
+    private HashMap<UUID, Double> playersBalances = new HashMap<>();
+    private HashMap<UUID, Double> sorted = new HashMap<>();
 
 
     private ArrayList<Double> values = new ArrayList<>();
-    private ArrayList<String> users = new ArrayList<>();
+    private ArrayList<UUID> users = new ArrayList<>();
 
     private List<String> excludedPlayers;
     private List<String> balplaceholders = new ArrayList<>();
@@ -39,10 +39,10 @@ public class BalTopAddon extends Addon {
     private BukkitTask offlineUpdater;
 
 
-    public BalTopAddon(HolographicPlaceholders holographicPlaceholders, String name){
+    public BalTopAddonV2(HolographicPlaceholders holographicPlaceholders, String name){
         this.holographicPlaceholders = holographicPlaceholders;
         this.name = name;
-        excludedPlayers = holographicPlaceholders.getConfig().getStringList("BalTop.excluded-users");
+        excludedPlayers = holographicPlaceholders.getConfig().getStringList("BalTopV2.excluded-users");
     }
 
     @Override
@@ -51,7 +51,7 @@ public class BalTopAddon extends Addon {
         registerPlaceholders();
         super.onEnable();
     }
-    
+
     @Override
     public void onDisable() {
         unRegisterPlaceholders();
@@ -67,7 +67,7 @@ public class BalTopAddon extends Addon {
                     if(!(excludedPlayers.contains(offlinePlayer.getName()))){
                         double playerbalance = holographicPlaceholders.getEconomy().getBalance(offlinePlayer);
                         //UUID playersuuid = offlinePlayer.getUniqueId();
-                        playersBalances.put(offlinePlayer.getName(), playerbalance);
+                        playersBalances.put(offlinePlayer.getUniqueId(), playerbalance);
                     }
                 }
 
@@ -89,7 +89,7 @@ public class BalTopAddon extends Addon {
 
 
     public void onlineBalanceUpdater() { // Update online players balance.
-        long delay = holographicPlaceholders.getConfig().getLong("BalTop.delay");
+        long delay = holographicPlaceholders.getConfig().getLong("BalTopV2.delay");
         balanceUpdater = new BukkitRunnable() {
             public void run() {
                 for (Player player : Bukkit.getOnlinePlayers()) {
@@ -101,7 +101,7 @@ public class BalTopAddon extends Addon {
                             playerbalance = 0.0;
                         }
                         //UUID playersuuid = player.getUniqueId();
-                        playersBalances.put(player.getName(), playerbalance);
+                        playersBalances.put(player.getUniqueId(), playerbalance);
                     }
                 }
 
@@ -123,7 +123,7 @@ public class BalTopAddon extends Addon {
     }
 
     public void offlineBalanceUpdater(){
-        long delay = holographicPlaceholders.getConfig().getLong("BalTop.offline-delay");
+        long delay = holographicPlaceholders.getConfig().getLong("BalTopV2.offline-delay");
         offlineUpdater = new BukkitRunnable() {
             @Override
             public void run() {
@@ -136,7 +136,7 @@ public class BalTopAddon extends Addon {
                                 playerbalance = 0D;
                             }
                             //UUID playersuuid = player.getUniqueId();
-                            playersBalances.put(player.getName(), playerbalance);
+                            playersBalances.put(player.getUniqueId(), playerbalance);
                     }
                 }
 
@@ -163,7 +163,7 @@ public class BalTopAddon extends Addon {
         return 0;
     }
 
-    public String getPlayer(int position){
+    public UUID getPlayer(int position){
         if(values.size() > position) {
             return users.get(position);
         }
@@ -175,14 +175,14 @@ public class BalTopAddon extends Addon {
     //------------------------------------------------------------------------------------------------------------------
 
     public void registerPlaceholders() {
-        long delay = holographicPlaceholders.getConfig().getLong("BalTop.placeholder-delay");
-        int size = holographicPlaceholders.getConfig().getInt("BalTop.size");
-        int format = holographicPlaceholders.getConfig().getInt("BalTop.format");
+        long delay = holographicPlaceholders.getConfig().getLong("BalTopV2.placeholder-delay");
+        int size = holographicPlaceholders.getConfig().getInt("BalTopV2.size");
+        int format = holographicPlaceholders.getConfig().getInt("BalTopV2.format");
 
         for (int index = 0; index < size; ++index) {
             int id = index + 1;
-            userplaceholders.add("{hpe-baltop-" + id + "-user}");
-            balplaceholders.add("{hpe-baltop-" + id + "-value}");
+            userplaceholders.add("{hpe-baltopV2-" + id + "-user}");
+            balplaceholders.add("{hpe-baltopV2-" + id + "-value}");
         }
 
 
@@ -206,7 +206,7 @@ public class BalTopAddon extends Addon {
                         @Override
                         public String update() {
                             //String data = getPlayer(i);
-                            return getPlayer(i);
+                            return Bukkit.getOfflinePlayer(getPlayer(i)).getName();
                         }
                     });
         }
@@ -227,29 +227,34 @@ public class BalTopAddon extends Addon {
 
 
     //------------------------------------------------------------------------------------------------------------------
-    public void stopBaltop(){
+    public boolean stopBaltop(){
         try{
             balanceUpdater.cancel();
             balanceRegister.cancel();
             offlineUpdater.cancel();
-
             sorted.clear();
             playersBalances.clear();
-        }catch (Exception ignored) {}
+            return true;
+        }catch (Exception error) {
+            return false;
+        }
     }
 
-    public void startBaltop(){
+    public boolean startBaltop(){
         try{
             registerAllBalances();
             onlineBalanceUpdater();
             offlineBalanceUpdater();
-        }catch (Exception ignored){ }
+            return true;
+        }catch (Exception error){
+            return false;
+        }
     }
 
     public int getPlayerPosition(Player player){
         for(int i = 0 ; i < this.users.size(); i++){
-            if(this.users.get(i).equalsIgnoreCase(player.getName())){
-                return i+1;
+            if(this.users.get(i) == player.getUniqueId()){
+                return i;
             }
         }
         return 0;

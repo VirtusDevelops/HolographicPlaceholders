@@ -52,6 +52,7 @@ public class PapiAddon extends PlaceholderExpansion {
             return String.valueOf(balTopAddon.getPlayerPosition(player));
         }
 
+
         if(identifier.equals("playtime")){
             return TextFormater.formatTime(playTimeAddon.getPlayTime(player));
         }

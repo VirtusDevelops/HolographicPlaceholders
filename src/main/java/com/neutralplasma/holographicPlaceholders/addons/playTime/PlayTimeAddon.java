@@ -27,6 +27,7 @@ public class PlayTimeAddon extends Addon implements Listener {
     private Listener listener;
     private HashMap<UUID, Long> cached = new HashMap<>();
     private HashMap<UUID, Long> players = new HashMap<>();
+    private List<String> excludedPlayers;
     private Map<Integer, UUID> orderedPlayers = new HashMap<>();
 
     private List<String> timeplaceholders = new ArrayList<>();
@@ -37,6 +38,7 @@ public class PlayTimeAddon extends Addon implements Listener {
     public PlayTimeAddon(HolographicPlaceholders holographicPlaceholders, DataStorage dataStorage){
         this.holographicPlaceholders = holographicPlaceholders;
         this.dataStorage = dataStorage;
+        excludedPlayers = holographicPlaceholders.getConfig().getStringList("PlayTime.excluded-users");
     }
 
     @Override
@@ -109,7 +111,7 @@ public class PlayTimeAddon extends Addon implements Listener {
             }
             players.put(uuid, playtime);
         }
-        dataStorage.saveData();
+        //dataStorage.saveData();
     }
 
     public void saveUpdate(int interval){
@@ -159,6 +161,7 @@ public class PlayTimeAddon extends Addon implements Listener {
                 .entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .filter(user -> !excludedPlayers.contains(Bukkit.getOfflinePlayer(user.getKey()).getName())) // FILTER
                 .collect(Collectors.toMap(
                         Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }

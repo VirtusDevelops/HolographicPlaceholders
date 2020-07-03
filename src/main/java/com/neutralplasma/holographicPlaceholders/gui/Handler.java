@@ -44,9 +44,11 @@ public class Handler {
         mainBaltop.openGUI(player, 1);
     }
 
+
     public void openBalTopEdit(Player player){
         balTopEdit.openGUI(player);
     }
+
 
     public void addToList(UUID uuid){
         openedInv.add(uuid);

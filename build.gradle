@@ -2,20 +2,33 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     id 'java'
+    id "com.jfrog.artifactory" version "4.16.0"
 }
 
 group 'SimplePlaceholder'
-version '2.0.5.1 Beta'
+version '2.0.6.1 Beta'
 
 sourceCompatibility = 1.8
+
+allprojects {
+    apply plugin: 'com.jfrog.artifactory'
+}
 
 repositories {
     mavenCentral()
     maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url 'https://papermc.io/repo/repository/maven-public/' }
     maven { url "http://repo.dmulloy2.net/nexus/repository/public/" }
     maven {
         name = 'placeholderapi'
         url = 'http://repo.extendedclip.com/content/repositories/placeholderapi/'
+    }
+    maven {
+        url = 'http://virtusdevelops.eu:8081/artifactory/VirtusCore'
+        credentials {
+            username = artifactory_user
+            password = artifactory_password
+        }
     }
     maven {
         url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/'
@@ -27,13 +40,13 @@ repositories {
 dependencies {
     implementation group: 'junit', name: 'junit', version: '4.12'
     implementation 'me.clip:placeholderapi:2.10.4'
-    implementation group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.5.0";
+    implementation group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.5.0"
     implementation group: 'org.spigotmc', name: 'spigot', version: '1.15.2-R0.1-SNAPSHOT'
-    implementation group: 'org.spigotmc', name: 'spigot', version: '1.14.2-R0.1-SNAPSHOT'
-    implementation group: 'org.spigotmc', name: 'spigot', version: '1.12.2-R0.1-SNAPSHOT'
     implementation 'me.clip:placeholderapi:v2.10.5'
     implementation files('libs/HolographicDisplays.jar')
     implementation "com.github.MilkBowl:VaultAPI:1.7"
+
+    compile group: 'eu.virtusdevelops', name: 'VirtusCore', version:'1.0.6.6'
 }
 
 processResources {

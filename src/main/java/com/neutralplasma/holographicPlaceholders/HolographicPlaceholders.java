@@ -5,18 +5,22 @@ import com.neutralplasma.holographicPlaceholders.addons.baltop.BalTopAddon;
 
 import com.neutralplasma.holographicPlaceholders.addons.PlaceholderAPI;
 import com.neutralplasma.holographicPlaceholders.addons.PapiAddon;
+import com.neutralplasma.holographicPlaceholders.addons.baltop.BalTopAddonV2;
 import com.neutralplasma.holographicPlaceholders.addons.playTime.PlayTimeAddon;
 import com.neutralplasma.holographicPlaceholders.addons.protocolLib.ProtocolHook;
+import com.neutralplasma.holographicPlaceholders.addons.statistics.Modulator;
 import com.neutralplasma.holographicPlaceholders.commands.CommandHandler;
 import com.neutralplasma.holographicPlaceholders.commands.MainCommand;
 import com.neutralplasma.holographicPlaceholders.commands.TabComplete;
-import com.neutralplasma.holographicPlaceholders.commands.subCommands.ReloadCommand;
+import com.neutralplasma.holographicPlaceholders.commands.subCommands.*;
 import com.neutralplasma.holographicPlaceholders.events.CloseInventoryEvent;
 import com.neutralplasma.holographicPlaceholders.events.InventoryOpenEvent;
 import com.neutralplasma.holographicPlaceholders.events.OnClickEvent;
 import com.neutralplasma.holographicPlaceholders.gui.Handler;
 import com.neutralplasma.holographicPlaceholders.storage.DataStorage;
 import com.neutralplasma.holographicPlaceholders.utils.*;
+import eu.virtusdevelops.virtuscore.managers.FileManager;
+import eu.virtusdevelops.virtuscore.utils.FileLocation;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
@@ -24,10 +28,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 
@@ -36,10 +37,12 @@ public class HolographicPlaceholders extends JavaPlugin {
     private BalanceFormater balanceFormater;
     private ConfigUtil configUtil;
     private DataStorage dataStorage;
+    private FileManager fileManager;
     Metrics metrics;
 
     Handler handler;
     private Map<Addon, String> addons = new HashMap<>();
+    private Modulator modulator;
     private static Economy econ = null;
 
 
@@ -50,12 +53,19 @@ public class HolographicPlaceholders extends JavaPlugin {
         long time = System.currentTimeMillis();
         metrics = new Metrics(this);
         configUtil = new ConfigUtil(this);
+        this.fileManager = new FileManager(this, new LinkedHashSet<>(Arrays.asList(
+                FileLocation.of("signs.yml", true, false))
+        ));
+        this.fileManager.loadFiles();
+
         this.dataStorage = new DataStorage(this);
         dataStorage.setup();
         setupConfig();
         setupEconomy();
         balanceFormater = new BalanceFormater();
+
         registerAddons();
+
         handler = new Handler(this);
         setupGui();
         registerCommands();
@@ -66,8 +76,8 @@ public class HolographicPlaceholders extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        dataStorage.saveData();
         unregisterAddons();
+        dataStorage.saveData();
         super.onDisable();
     }
 
@@ -85,21 +95,28 @@ public class HolographicPlaceholders extends JavaPlugin {
     }
 
     public void registerAddons(){
-        List<Addon> toRemove = new ArrayList<>();
-        BalTopAddon baltopAddon = new BalTopAddon(this, balanceFormater);
+        //List<Addon> toRemove = new ArrayList<>();
+        BalTopAddon baltopAddon = new BalTopAddon(this, "BalTop");
+        BalTopAddonV2 balTopAddonV2 = new BalTopAddonV2(this, "BalTopV2");
         Addon protocolAddon = new ProtocolHook(this);
         Addon placeholderAddon = new PlaceholderAPI(this);
         PlayTimeAddon playTimeAddon = new PlayTimeAddon(this, dataStorage);
+        modulator = new Modulator(this, dataStorage, fileManager);
 
-        baltopAddon.setName("BalTop");
+        // OLD SYSTEM
         protocolAddon.setName("ProtocolLib");
         placeholderAddon.setName("PlaceholderAPI");
         playTimeAddon.setName("PlayTime");
+        modulator.setName("MultiPlaceholders");
 
-        addons.put(baltopAddon, baltopAddon.getName());
+
+        addons.put(baltopAddon, baltopAddon.getName()); // reworked
+        addons.put(balTopAddonV2, balTopAddonV2.getName()); // reworked
+
         addons.put(protocolAddon, protocolAddon.getName());
         addons.put(placeholderAddon, placeholderAddon.getName());
         addons.put(playTimeAddon, placeholderAddon.getName());
+        addons.put(modulator, modulator.getName());
 
         for(Addon addon : addons.keySet()) {
             if (this.getConfig().getBoolean("addons." + addons.get(addon))) {
@@ -112,11 +129,10 @@ public class HolographicPlaceholders extends JavaPlugin {
                 }
             }
         }
-        if(baltopAddon.isEnabled() && placeholderAddon.isEnabled()){
-            if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null){
-                new PapiAddon(this, baltopAddon, playTimeAddon).register();
-            }
+        if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null){
+            new PapiAddon(this, baltopAddon, playTimeAddon).register();
         }
+
     }
 
     private boolean setupEconomy() {
@@ -152,6 +168,10 @@ public class HolographicPlaceholders extends JavaPlugin {
         sender.sendMessage(TextFormater.sFormatText("&e==================[ &7Reload &e]=================="));
         long time = System.currentTimeMillis();
         reloadConfig();
+
+        this.fileManager.clear();
+        this.fileManager.loadFiles();
+
         unregisterAddons();
         registerAddons();
         time = (time - System.currentTimeMillis())*-1;
@@ -187,6 +207,10 @@ public class HolographicPlaceholders extends JavaPlugin {
 
         //Registers the command /example args based on args[0] (args)
         handler.register("reload", new ReloadCommand(this));
+        handler.register("setsign", new SetSignCommand(this, modulator));
+        handler.register("sethead", new SetHeadCommand(this, modulator));
+        handler.register("removehead", new RemoveHeadCommand(this, modulator));
+        handler.register("removesign", new RemoveSignCommand(this, modulator));
 
         getCommand("hpe").setExecutor(handler);
         getCommand("hpe").setTabCompleter(new TabComplete(this));

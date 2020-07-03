@@ -19,7 +19,7 @@ public class PacketEditor extends PacketAdapter{
     public PacketEditor(final AdapterParameteters params){
         super(params);
         final String version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
-        if (version.contains("v1_13") || version.contains("v1_14") || version.contains("v1_15")) {
+        if (version.contains("v1_13") || version.contains("v1_14") || version.contains("v1_15") || version.contains("v1_16")) {
             this.useOptional = true;
         }
     }
@@ -54,15 +54,15 @@ public class PacketEditor extends PacketAdapter{
         String newName;
         if (this.useOptional) {
             if (!(customNameWatchableObjectValue instanceof Optional)) {
-            return false;
+                return false;
             }
             final Optional<?> customNameOptional = (Optional<?>)customNameWatchableObjectValue;
 
             if (!customNameOptional.isPresent()) {
                 return false;
             }
-        final WrappedChatComponent componentWrapper = WrappedChatComponent.fromHandle(customNameOptional.get());
-        newName = componentWrapper.getJson();
+            final WrappedChatComponent componentWrapper = WrappedChatComponent.fromHandle(customNameOptional.get());
+            newName = componentWrapper.getJson();
         } else {
             newName = (String)customNameWatchableObjectValue;
         }

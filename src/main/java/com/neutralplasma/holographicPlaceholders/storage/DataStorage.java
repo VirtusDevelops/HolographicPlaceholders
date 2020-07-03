@@ -5,6 +5,8 @@ import com.neutralplasma.holographicPlaceholders.utils.TextFormater;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import javax.xml.crypto.Data;
 import java.io.File;
@@ -44,6 +46,7 @@ public class DataStorage {
 
         }
         dataConfiguration = YamlConfiguration.loadConfiguration(dataFile);
+        startSaver();
     }
 
     public FileConfiguration getData() {
@@ -58,6 +61,16 @@ public class DataStorage {
         }catch(IOException e){
             Bukkit.getConsoleSender().sendMessage(TextFormater.sFormatText("&cFailed to save data.yml file, Error: &f" + e.getMessage()));
         }
+    }
+
+    public void startSaver(){
+        Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
+            @Override
+            public void run() {
+                saveData();
+            }
+        }, 0L, 1500L);
+
     }
 
     public void reloadData() {
