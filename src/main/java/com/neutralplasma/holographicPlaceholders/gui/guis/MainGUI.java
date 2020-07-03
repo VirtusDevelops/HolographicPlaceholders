@@ -10,6 +10,7 @@ import com.neutralplasma.holographicPlaceholders.gui.actions.LeftClickAction;
 import com.neutralplasma.holographicPlaceholders.gui.actions.RightClickAction;
 import com.neutralplasma.holographicPlaceholders.utils.TextFormater;
 import com.neutralplasma.holographicPlaceholders.utils.XMaterial;
+import eu.virtusdevelops.virtuscore.utils.TextUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -42,16 +43,16 @@ public class MainGUI {
         for(Addon addon : holographicPlaceholders.getAddons().keySet()){
             ItemStack item = XMaterial.BOOK.parseItem();
             ItemMeta itemMeta = item.getItemMeta();
-            itemMeta.setDisplayName(TextFormater.sFormatText("&e" + addon.getName()));
+            itemMeta.setDisplayName(TextUtil.colorFormat("&e" + addon.getName()));
             List<String> lore = new ArrayList<>();
-            lore.add(TextFormater.sFormatText("&7"));
-            lore.add(TextFormater.sFormatText("&7R-Click to edit."));
-            lore.add(TextFormater.sFormatText("&7L-Click to &aEnable&7/&cDisable."));
-            lore.add(TextFormater.sFormatText("&7"));
+            lore.add(TextUtil.colorFormat("&7"));
+            lore.add(TextUtil.colorFormat("&7R-Click to edit."));
+            lore.add(TextUtil.colorFormat("&7L-Click to &aEnable&7/&cDisable."));
+            lore.add(TextUtil.colorFormat("&7"));
             if(addon.isEnabled()) {
-                lore.add(TextFormater.sFormatText("&7Currently: &aEnabled"));
+                lore.add(TextUtil.colorFormat("&7Currently: &aEnabled"));
             }else{
-                lore.add(TextFormater.sFormatText("&7Currently: &cDisabled"));
+                lore.add(TextUtil.colorFormat("&7Currently: &cDisabled"));
             }
             itemMeta.setLore(lore);
             item.setItemMeta(itemMeta);

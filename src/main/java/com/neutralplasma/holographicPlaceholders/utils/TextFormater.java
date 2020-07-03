@@ -9,15 +9,6 @@ import java.util.TimeZone;
 
 public class TextFormater {
 
-    public static String sFormatText(String message){
-        String formated = ChatColor.translateAlternateColorCodes('&', message);
-        return formated;
-    }
-
-    public static String ColorFormat(String text){
-        String formated = ChatColor.translateAlternateColorCodes('&', text);
-        return formated;
-    }
 
     private static String formatDecimals(Long number){
         DecimalFormat dformater = new DecimalFormat("###.##");

@@ -40,7 +40,7 @@ public class RemoveHeadCommand implements CommandInterface {
                 }
             }
         }else{
-            sender.sendMessage(TextFormater.sFormatText("&cERROR: This is player only command!"));
+            sender.sendMessage(TextUtil.colorFormat("&cERROR: This is player only command!"));
         }
         return false;
     }

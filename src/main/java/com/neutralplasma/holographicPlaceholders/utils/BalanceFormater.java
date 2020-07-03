@@ -23,8 +23,8 @@ public class BalanceFormater {
     }
 
     public static String formatNames(Double number){
-        char[] suffix = {' ', 'k', 'M', 'B', 'T', 'P', 'E'};
-        double numValue = number.doubleValue();
+        char[] suffix = {' ', 'k', 'M', 'B', 'T', 'P', 'E', 'Z', 'Y'};
+        double numValue = number;
         int value = (int) Math.floor(Math.log10(numValue));
         int base = value / 3;
         if (value >= 3 && base < suffix.length) {
