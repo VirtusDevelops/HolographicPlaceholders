@@ -18,7 +18,7 @@ public class ConfigUtil {
         holographicPlaceholders.saveDefaultConfig();
         if(holographicPlaceholders.getConfig().contains("config-version")) {
             double version = holographicPlaceholders.getConfig().getDouble("config-version");
-            double newestVersion = 2.7;
+            double newestVersion = 2.9;
             if (version < newestVersion) {
                 recreateConfig();
             }
@@ -35,15 +35,23 @@ public class ConfigUtil {
         config.set("addons.BalTopV2", false);
         config.set("addons.ProtocolLib", true);
         config.set("addons.PlaceholderAPI", true);
-        config.set("addons.PlayTime", false);
         config.set("addons.MultiPlaceholders", true);
 
         config.set("placeholder-addons.%statistic_deaths%.size", 10);
         config.set("placeholder-addons.%statistic_deaths%.interval", 200.0);
         config.set("placeholder-addons.%statistic_deaths%.value", "number");
         config.set("placeholder-addons.%statistic_deaths%.format", 1);
-        config.set("placeholder-addons.%statistic_deaths%.signs", true);
-        config.set("placeholder-addons.%statistic_deaths%.heads", true);
+        config.set("placeholder-addons.%statistic_deaths%.signs", false);
+        config.set("placeholder-addons.%statistic_deaths%.heads", false);
+        config.set("placeholder-addons.%statistic_deaths%.placeholder-delay", 10);
+
+        config.set("placeholder-addons.%statistic_seconds_played%.size", 10);
+        config.set("placeholder-addons.%statistic_seconds_played%.interval", 200.0);
+        config.set("placeholder-addons.%statistic_seconds_played%.value", "time");
+        config.set("placeholder-addons.%statistic_seconds_played%.format", 1);
+        config.set("placeholder-addons.%statistic_seconds_played%.signs", false);
+        config.set("placeholder-addons.%statistic_seconds_played%.heads", false);
+        config.set("placeholder-addons.%statistic_seconds_played%.placeholder-delay", 10);
 
         config.set("placeholderAPI.delay", 1);
         List<String> placeholders = new ArrayList<>();
@@ -69,13 +77,7 @@ public class ConfigUtil {
         config.set("BalTop.excluded-users", excludedUsers);
         config.set("BalTopV2.excluded-users", new ArrayList<>(excludedUsers));
 
-        config.set("PlayTime.update-delay", 4000.0);
-        config.set("PlayTime.placeholder-delay", 200.0);
-        config.set("PlayTime.size", 20);
-
-
-
-        config.set("config-version", 2.7);
+        config.set("config-version", 2.9);
         holographicPlaceholders.saveConfig();
     }
 }

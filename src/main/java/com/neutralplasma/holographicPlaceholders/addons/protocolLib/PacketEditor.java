@@ -7,19 +7,22 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 
+import eu.virtusdevelops.virtuscore.compatibility.ServerVersion;
 import me.clip.placeholderapi.PlaceholderAPI;
-import org.bukkit.*;
 import org.bukkit.entity.*;
+import org.json.simple.parser.JSONParser;
+
 import java.util.*;
 
 
 public class PacketEditor extends PacketAdapter{
     private boolean useOptional;
+    private JSONParser parser = new JSONParser();
 
     public PacketEditor(final AdapterParameteters params){
         super(params);
-        final String version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
-        if (version.contains("v1_13") || version.contains("v1_14") || version.contains("v1_15") || version.contains("v1_16")) {
+
+        if (ServerVersion.isServerVersionAtLeast(ServerVersion.V1_13)) {
             this.useOptional = true;
         }
     }
@@ -63,13 +66,23 @@ public class PacketEditor extends PacketAdapter{
             }
             final WrappedChatComponent componentWrapper = WrappedChatComponent.fromHandle(customNameOptional.get());
             newName = componentWrapper.getJson();
+
         } else {
             newName = (String)customNameWatchableObjectValue;
         }
+
         newName = PlaceholderAPI.setPlaceholders(player, newName);
 
+
+
+        //newName = HexUtil.colorify(newName);
+        //VirtusCore.console().sendMessage("Value: << " + newName + " >>");
+        //player.sendMessage(newName);
+        //String test = HexUtil.colorify("<r>This is a test message lets see if it works");
+
         if (this.useOptional) {
-            customNameWatchableObject.setValue(Optional.of(WrappedChatComponent.fromJson(newName).getHandle()));
+
+            customNameWatchableObject.setValue(Optional.of(WrappedChatComponent.fromJson(newName).getHandle() /*WrappedChatComponent.fromChatMessage(test)[0].getHandle()*/));
         } else {
             customNameWatchableObject.setValue(newName);
         }

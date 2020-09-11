@@ -1,6 +1,6 @@
 package com.neutralplasma.holographicPlaceholders.addons.protocolLib;
 
-import com.gmail.filoghost.holographicdisplays.api.placeholder.PlaceholderReplacer;
+import com.neutralplasma.holographicPlaceholders.placeholder.PlaceholderReplacer;
 import com.neutralplasma.holographicPlaceholders.utils.TextFormater;
 import eu.virtusdevelops.virtuscore.utils.TextUtil;
 import org.bukkit.Bukkit;

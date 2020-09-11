@@ -2,9 +2,10 @@ package com.neutralplasma.holographicPlaceholders.addons.statistics;
 
 import com.neutralplasma.holographicPlaceholders.HolographicPlaceholders;
 import com.neutralplasma.holographicPlaceholders.addons.Addon;
+import com.neutralplasma.holographicPlaceholders.placeholder.PlaceholderRegistry;
 import com.neutralplasma.holographicPlaceholders.storage.DataStorage;
 import com.neutralplasma.holographicPlaceholders.storage.SignLocation;
-import com.neutralplasma.holographicPlaceholders.utils.TextFormater;
+import com.neutralplasma.holographicPlaceholders.utils.PluginHook;
 import eu.virtusdevelops.virtuscore.managers.FileManager;
 import eu.virtusdevelops.virtuscore.utils.TextUtil;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -20,11 +21,15 @@ public class Modulator extends Addon {
     private HolographicPlaceholders holographicPlaceholders;
     private DataStorage dataStorage;
     private FileManager fileManager;
+    private PlaceholderRegistry placeholderRegistry;
 
-    public Modulator(HolographicPlaceholders holographicPlaceholders, DataStorage dataStorage, FileManager fileManager){
+    public Modulator(HolographicPlaceholders holographicPlaceholders, DataStorage dataStorage, FileManager fileManager,
+                     PlaceholderRegistry placeholderRegistry){
         this.holographicPlaceholders = holographicPlaceholders;
+        this.placeholderRegistry = placeholderRegistry;
         this.dataStorage = dataStorage;
         this.fileManager = fileManager;
+        this.setHook(PluginHook.BOTH);
     }
 
     @Override
@@ -103,7 +108,7 @@ public class Modulator extends Addon {
                 int placeholderdelay = holographicPlaceholders.getConfig().getInt("placeholder-addons." + placeholder + ".placeholder-delay");
                 boolean doSigns = holographicPlaceholders.getConfig().getBoolean("placeholder-addons." + placeholder + ".signs");
                 boolean doHeads = holographicPlaceholders.getConfig().getBoolean("placeholder-addons." + placeholder + ".heads");
-                // ADDING SIGNS W.I.P
+
                 List<String> signs = dataStorage.getData().getStringList("addon-data." + placeholder + ".signs");
                 HashMap<SignLocation, Integer> signsdata = new HashMap<>();
 
@@ -130,7 +135,7 @@ public class Modulator extends Addon {
                 }
 
                 Module module = new Module(placeholder, interval, size, type, format, placeholderdelay, doSigns,
-                        doHeads, dataStorage, holographicPlaceholders, fileManager);
+                        doHeads, dataStorage, holographicPlaceholders, fileManager, placeholderRegistry);
                 module.addSigns(signsdata);
                 module.addHeads(headsdata);
                 modules.add(module);

@@ -3,22 +3,23 @@ package com.neutralplasma.holographicPlaceholders;
 import com.neutralplasma.holographicPlaceholders.addons.Addon;
 import com.neutralplasma.holographicPlaceholders.addons.baltop.BalTopAddon;
 
-import com.neutralplasma.holographicPlaceholders.addons.PlaceholderAPI;
-import com.neutralplasma.holographicPlaceholders.addons.PapiAddon;
+import com.neutralplasma.holographicPlaceholders.addons.*;
 import com.neutralplasma.holographicPlaceholders.addons.baltop.BalTopAddonV2;
-import com.neutralplasma.holographicPlaceholders.addons.playTime.PlayTimeAddon;
 import com.neutralplasma.holographicPlaceholders.addons.protocolLib.ProtocolHook;
 import com.neutralplasma.holographicPlaceholders.addons.statistics.Modulator;
-import com.neutralplasma.holographicPlaceholders.commands.CommandHandler;
-import com.neutralplasma.holographicPlaceholders.commands.MainCommand;
-import com.neutralplasma.holographicPlaceholders.commands.TabComplete;
-import com.neutralplasma.holographicPlaceholders.commands.subCommands.*;
+import com.neutralplasma.holographicPlaceholders.animations.AnimationRegistery;
+import com.neutralplasma.holographicPlaceholders.animations.AnimationReplacer;
+import com.neutralplasma.holographicPlaceholders.animations.PlaceholderRegistery;
+import com.neutralplasma.holographicPlaceholders.command.*;
 import com.neutralplasma.holographicPlaceholders.events.CloseInventoryEvent;
 import com.neutralplasma.holographicPlaceholders.events.InventoryOpenEvent;
 import com.neutralplasma.holographicPlaceholders.events.OnClickEvent;
 import com.neutralplasma.holographicPlaceholders.gui.Handler;
+import com.neutralplasma.holographicPlaceholders.placeholder.PlaceholderRegistry;
+import com.neutralplasma.holographicPlaceholders.storage.AnimationLoader;
 import com.neutralplasma.holographicPlaceholders.storage.DataStorage;
 import com.neutralplasma.holographicPlaceholders.utils.*;
+import eu.virtusdevelops.virtuscore.command.CommandManager;
 import eu.virtusdevelops.virtuscore.managers.FileManager;
 import eu.virtusdevelops.virtuscore.utils.FileLocation;
 import eu.virtusdevelops.virtuscore.utils.TextUtil;
@@ -30,7 +31,6 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
-import java.util.logging.Level;
 
 
 public class HolographicPlaceholders extends JavaPlugin {
@@ -38,6 +38,12 @@ public class HolographicPlaceholders extends JavaPlugin {
     private ConfigUtil configUtil;
     private DataStorage dataStorage;
     private FileManager fileManager;
+    private CommandManager commandManager;
+    private AnimationRegistery animationRegistery;
+    private PlaceholderRegistery placeholderRegistery;
+    private AnimationLoader animationLoader;
+    private PluginHook pluginHook;
+    private PlaceholderRegistry placeholderRegistry;
     Metrics metrics;
 
     Handler handler;
@@ -51,13 +57,34 @@ public class HolographicPlaceholders extends JavaPlugin {
         ConsoleCommandSender sender = Bukkit.getConsoleSender();
         sender.sendMessage(TextUtil.colorFormat("&e==================[ &7Starting &e]=================="));
         long time = System.currentTimeMillis();
-        metrics = new Metrics(this);
+        PluginManager pm = Bukkit.getPluginManager();
+        // Check if HologramsPlugin is present.
+        if(pm.isPluginEnabled("SimpleHolograms")){
+            pluginHook = PluginHook.SIMPLEHOLOGRAMS;
+        }else if(pm.isPluginEnabled("HolographicDisplays")){
+            pluginHook = PluginHook.HOLOGRAPHICDISPLAYS;
+        }else{
+            sender.sendMessage("Could not find any compatible holograms plugin, disabling plugin...");
+            pm.disablePlugin(this);
+            return;
+        }
+        // Regsisters placeholderRegistry
+        this.placeholderRegistry = new PlaceholderRegistry(this);
+
+
+        metrics = new Metrics(this); // Metrics for bstats
+        // Loads configuration files.
         configUtil = new ConfigUtil(this);
         this.fileManager = new FileManager(this, new LinkedHashSet<>(Arrays.asList(
-                FileLocation.of("signs.yml", true, false))
-        ));
+                FileLocation.of("signs.yml", true, false),
+                FileLocation.of("animations.yml", true, false)
+        )));
         this.fileManager.loadFiles();
 
+        // Configures commandManager
+        this.commandManager = new CommandManager(this);
+
+        // DataStorage
         this.dataStorage = new DataStorage(this);
         dataStorage.setup();
         setupConfig();
@@ -65,11 +92,16 @@ public class HolographicPlaceholders extends JavaPlugin {
 
         registerAddons();
 
+        registerAnimations();
+
+        // Gui stuff that needs to be recoded.
         handler = new Handler(this);
         setupGui();
+
+        // Register commands.
         registerCommands();
         time = (time - System.currentTimeMillis())*-1;
-        this.getLogger().setLevel(Level.INFO);
+        //this.getLogger().setLevel(Level.INFO);
         sender.sendMessage(TextUtil.colorFormat("&e=================[ &7Done: &e" + time + "&7ms &e]================="));
     }
 
@@ -95,41 +127,49 @@ public class HolographicPlaceholders extends JavaPlugin {
 
     public void registerAddons(){
         //List<Addon> toRemove = new ArrayList<>();
-        BalTopAddon baltopAddon = new BalTopAddon(this, "BalTop");
-        BalTopAddonV2 balTopAddonV2 = new BalTopAddonV2(this, "BalTopV2");
-        Addon protocolAddon = new ProtocolHook(this);
-        Addon placeholderAddon = new PlaceholderAPI(this);
-        PlayTimeAddon playTimeAddon = new PlayTimeAddon(this, dataStorage);
-        modulator = new Modulator(this, dataStorage, fileManager);
+        BalTopAddon balTopAddon = new BalTopAddon(this, fileManager, dataStorage,"BalTop", placeholderRegistry);
+        BalTopAddonV2 balTopAddonV2 = new BalTopAddonV2(this, "BalTopV2", placeholderRegistry);
+        Addon placeholderAddon = new PlaceholderAPI(this, placeholderRegistry);
+        //Addon protocolAddon = new ProtocolHook(this, placeholderRegistry);
+
+        modulator = new Modulator(this, dataStorage, fileManager, placeholderRegistry);
 
         // OLD SYSTEM
-        protocolAddon.setName("ProtocolLib");
+        //protocolAddon.setName("ProtocolLib");
         placeholderAddon.setName("PlaceholderAPI");
-        playTimeAddon.setName("PlayTime");
+
+        if(Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")){
+            Addon protocolAddon = new ProtocolHook(this, placeholderRegistry);
+            protocolAddon.setName("ProtocolLib");
+            addons.put(modulator, modulator.getName());
+        }
+
+
         modulator.setName("MultiPlaceholders");
 
 
-        addons.put(baltopAddon, baltopAddon.getName()); // reworked
+        addons.put(balTopAddon, balTopAddon.getName()); // reworked
         addons.put(balTopAddonV2, balTopAddonV2.getName()); // reworked
 
-        addons.put(protocolAddon, protocolAddon.getName());
+        //addons.put(protocolAddon, protocolAddon.getName());
         addons.put(placeholderAddon, placeholderAddon.getName());
-        addons.put(playTimeAddon, placeholderAddon.getName());
         addons.put(modulator, modulator.getName());
 
         for(Addon addon : addons.keySet()) {
             if (this.getConfig().getBoolean("addons." + addons.get(addon))) {
-                if (!addon.isEnabled()) {
+                if (!addon.isEnabled() && addon.getHook().shouldEnable(pluginHook)) {
                     addon.onEnable();
                     Bukkit.getConsoleSender().sendMessage(TextUtil.colorFormat("&8[&eHPE&8] &7Enabled: &e" + addon.getName()));
                     if (addon.getName().equals("ProtocolLib")) {
                         metrics.addCustomChart(new Metrics.SimplePie("protocollib_enabled", () -> "True"));
                     }
+                }else{
+                    getLogger().info("Not enabling " + addon.getName() + " due to it's not compatible with current holograms plugin.");
                 }
             }
         }
         if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null){
-            new PapiAddon(this, baltopAddon, playTimeAddon).register();
+            new PapiAddon(this, balTopAddon, balTopAddonV2).register();
         }
 
     }
@@ -154,6 +194,7 @@ public class HolographicPlaceholders extends JavaPlugin {
         configUtil.setupConfig();
     }
 
+    // TODO: Redo entire GUI handler (its already in VirtusCore)
     public void setupGui(){
         Handler handler = new Handler(this);
         PluginManager pluginManager = Bukkit.getPluginManager();
@@ -162,6 +203,7 @@ public class HolographicPlaceholders extends JavaPlugin {
         pluginManager.registerEvents(new InventoryOpenEvent(handler), this);
     }
 
+    // Reload
     public long reload(){
         ConsoleCommandSender sender = Bukkit.getConsoleSender();
         sender.sendMessage(TextUtil.colorFormat("&e==================[ &7Reload &e]=================="));
@@ -171,17 +213,33 @@ public class HolographicPlaceholders extends JavaPlugin {
         this.fileManager.clear();
         this.fileManager.loadFiles();
 
+
+
+
+        placeholderRegistery.unregisterPlaceholders();
+
         unregisterAddons();
         registerAddons();
+
+        animationRegistery.reload();
+        animationLoader.reload();
+
+
         time = (time - System.currentTimeMillis())*-1;
         sender.sendMessage(TextUtil.colorFormat("&e=================[ &7Done: &e" + time + "&7ms &e]================="));
         return time;
     }
+
     public void enableAddon(Addon addon){
-        addon.onEnable();
-        Bukkit.getConsoleSender().sendMessage(TextUtil.colorFormat("&8[&eHPE&8] &7Enabled: &e" + addon.getName()));
-        if(addon.getName().equals("ProtocolLib")) {
-            metrics.addCustomChart(new Metrics.SimplePie("protocollib_enabled", () -> "True"));
+        if(addon.getHook().shouldEnable(pluginHook)) {
+            addon.onEnable();
+            Bukkit.getConsoleSender().sendMessage(TextUtil.colorFormat("&8[&eHPE&8] &7Enabled: &e" + addon.getName()));
+            if (addon.getName().equals("ProtocolLib")) {
+                metrics.addCustomChart(new Metrics.SimplePie("protocollib_enabled", () -> "True"));
+            }
+        }else{
+
+            getLogger().info("Not enabling " + addon.getName() + " due to it's not compatible with current holograms plugin " + addon.getHook().toString() + ":" + pluginHook.toString());
         }
     }
 
@@ -193,27 +251,37 @@ public class HolographicPlaceholders extends JavaPlugin {
         }
     }
 
-    public void reload(Addon addon){
-        addon.onDisable();
-        addon.onEnable();
+    public void registerAnimations(){
+        animationRegistery = new AnimationRegistery();
+        AnimationReplacer.setAnimationRegistry(animationRegistery);
+        placeholderRegistery = new PlaceholderRegistery(this, placeholderRegistry);
+
+        animationLoader = new AnimationLoader(this, fileManager);
+        animationLoader.reload();
+    }
+
+    public PlaceholderRegistery getPlaceholderRegistery() {
+        return placeholderRegistery;
+    }
+
+    public AnimationRegistery getAnimationRegistry() {
+        return animationRegistery;
     }
 
     private void registerCommands() {
 
-        CommandHandler handler = new CommandHandler();
+        commandManager.addMainCommand("hpe").addSubCommands(
+                new ReloadCommand(this),
+                new MenuCommand(this, handler),
+                new RemoveHeadCommand(this, modulator),
+                new RemoveSignCommand(this, modulator),
+                new SetHeadCommand(this, modulator),
+                new SetSignCommand(this, modulator)
+        );
+    }
 
-        //Registers the command /example which has no arguments.
-        handler.register("hpe", new MainCommand(this, this.handler));
-
-        //Registers the command /example args based on args[0] (args)
-        handler.register("reload", new ReloadCommand(this));
-        handler.register("setsign", new SetSignCommand(this, modulator));
-        handler.register("sethead", new SetHeadCommand(this, modulator));
-        handler.register("removehead", new RemoveHeadCommand(this, modulator));
-        handler.register("removesign", new RemoveSignCommand(this, modulator));
-
-        getCommand("hpe").setExecutor(handler);
-        getCommand("hpe").setTabCompleter(new TabComplete(this));
+    public PluginHook getPluginHook(){
+        return this.pluginHook;
     }
 
     public Map<Addon, String> getAddons(){

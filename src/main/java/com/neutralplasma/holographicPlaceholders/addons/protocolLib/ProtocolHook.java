@@ -3,23 +3,33 @@ package com.neutralplasma.holographicPlaceholders.addons.protocolLib;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketAdapter;
-import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.neutralplasma.holographicPlaceholders.HolographicPlaceholders;
 import com.neutralplasma.holographicPlaceholders.addons.Addon;
+import com.neutralplasma.holographicPlaceholders.placeholder.PlaceholderRegistry;
+import com.neutralplasma.holographicPlaceholders.utils.PluginHook;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class ProtocolHook extends Addon {
     private HolographicPlaceholders holographicPlaceholders;
+    private PlaceholderRegistry placeholderRegistry;
 
-    public ProtocolHook(HolographicPlaceholders holographicPlaceholders){
+    public ProtocolHook(HolographicPlaceholders holographicPlaceholders, PlaceholderRegistry placeholderRegistry){
         this.holographicPlaceholders = holographicPlaceholders;
+        this.placeholderRegistry = placeholderRegistry;
+        this.setHook(PluginHook.HOLOGRAPHICDISPLAYS);
     }
 
 
     @Override
     public void onEnable() {
+        if(holographicPlaceholders.getPluginHook() == PluginHook.SIMPLEHOLOGRAMS){
+            holographicPlaceholders.getLogger().info("Not enabling this expansion.. its built into holograms plugin");
+            super.onEnable();
+            return;
+        }
+
         hook(holographicPlaceholders);
         registerFastPlaceholder();
         super.onEnable();
@@ -42,14 +52,18 @@ public class ProtocolHook extends Addon {
 
     public void registerFastPlaceholder(){
         final List<String> changingTextImitation = Arrays.asList("&8 &r", "&7 &r");
-        HologramsAPI.registerPlaceholder(holographicPlaceholders, "{fast}", 0.1, new TimePlaceholdersUpdater(changingTextImitation));
-        HologramsAPI.registerPlaceholder(holographicPlaceholders, "{medium}", 1, new TimePlaceholdersUpdater(changingTextImitation));
-        HologramsAPI.registerPlaceholder(holographicPlaceholders, "{slow}", 10, new TimePlaceholdersUpdater(changingTextImitation));
+
+        placeholderRegistry.getRegister().registerPlaceholder(holographicPlaceholders, "{fast}", 0.1, new TimePlaceholdersUpdater(changingTextImitation));
+        placeholderRegistry.getRegister().registerPlaceholder(holographicPlaceholders, "{medium}", 1, new TimePlaceholdersUpdater(changingTextImitation));
+        placeholderRegistry.getRegister().registerPlaceholder(holographicPlaceholders, "{slow}", 10, new TimePlaceholdersUpdater(changingTextImitation));
+
     }
 
     public void unregisterFastPlaceholders(){
-        HologramsAPI.unregisterPlaceholder(holographicPlaceholders, "{fast}");
-        HologramsAPI.unregisterPlaceholder(holographicPlaceholders, "{medium}");
-        HologramsAPI.unregisterPlaceholder(holographicPlaceholders, "{slow}");
+
+        placeholderRegistry.getRegister().unregisterPlaceholder(holographicPlaceholders, "{fast}");
+        placeholderRegistry.getRegister().unregisterPlaceholder(holographicPlaceholders, "{medium}");
+        placeholderRegistry.getRegister().unregisterPlaceholder(holographicPlaceholders, "{slow}");
+
     }
 }

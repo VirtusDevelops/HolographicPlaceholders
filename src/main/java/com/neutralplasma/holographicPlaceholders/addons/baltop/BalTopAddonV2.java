@@ -1,10 +1,12 @@
 package com.neutralplasma.holographicPlaceholders.addons.baltop;
 
-import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
-import com.gmail.filoghost.holographicdisplays.api.placeholder.PlaceholderReplacer;
+
 import com.neutralplasma.holographicPlaceholders.HolographicPlaceholders;
 import com.neutralplasma.holographicPlaceholders.addons.Addon;
+import com.neutralplasma.holographicPlaceholders.placeholder.PlaceholderRegistry;
+import com.neutralplasma.holographicPlaceholders.placeholder.PlaceholderReplacer;
 import com.neutralplasma.holographicPlaceholders.utils.BalanceFormater;
+import com.neutralplasma.holographicPlaceholders.utils.PluginHook;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 public class BalTopAddonV2 extends Addon {
 
     private HolographicPlaceholders holographicPlaceholders;
+    private PlaceholderRegistry placeholderRegistry;
     private HashMap<UUID, Double> playersBalances = new HashMap<>();
     private HashMap<UUID, Double> sorted = new HashMap<>();
 
@@ -39,9 +42,11 @@ public class BalTopAddonV2 extends Addon {
     private BukkitTask offlineUpdater;
 
 
-    public BalTopAddonV2(HolographicPlaceholders holographicPlaceholders, String name){
+    public BalTopAddonV2(HolographicPlaceholders holographicPlaceholders, String name, PlaceholderRegistry placeholderRegistry){
         this.holographicPlaceholders = holographicPlaceholders;
         this.name = name;
+        this.placeholderRegistry = placeholderRegistry;
+        this.setHook(PluginHook.BOTH);
         excludedPlayers = holographicPlaceholders.getConfig().getStringList("BalTopV2.excluded-users");
     }
 
@@ -189,35 +194,43 @@ public class BalTopAddonV2 extends Addon {
         for (int index = 0; index < balplaceholders.size(); ++index) {
             String replacedplaceholder = balplaceholders.get(index);
             int i = index;
-            HologramsAPI.registerPlaceholder(holographicPlaceholders, replacedplaceholder, delay, new
-                    PlaceholderReplacer() {
-                        @Override
-                        public String update() {
-                            return BalanceFormater.formatValue(format, getValue(i));
-                        }
-                    });
+
+            placeholderRegistry.getRegister().registerPlaceholder(holographicPlaceholders, replacedplaceholder, delay, new PlaceholderReplacer() {
+                @Override
+                public String update() {
+                    return BalanceFormater.formatValue(format, getValue(i));
+                }
+            });
+
         }
 
         for (int index = 0; index < userplaceholders.size(); ++index) {
             String replacedplaceholder = userplaceholders.get(index);
             int i = index;
-            HologramsAPI.registerPlaceholder(holographicPlaceholders, replacedplaceholder, delay, new
-                    PlaceholderReplacer() {
-                        @Override
-                        public String update() {
-                            //String data = getPlayer(i);
-                            return Bukkit.getOfflinePlayer(getPlayer(i)).getName();
-                        }
-                    });
+
+            placeholderRegistry.getRegister().registerPlaceholder(holographicPlaceholders, replacedplaceholder, delay, new PlaceholderReplacer() {
+                @Override
+                public String update() {
+                    UUID player = getPlayer(i);
+                    if(player != null) {
+                        return Bukkit.getOfflinePlayer(player).getName();
+                    }else{
+                        return "";
+                    }
+                }
+            });
+
+
         }
     }
 
     public void unRegisterPlaceholders(){
+
         for(String placeholder : balplaceholders){
-            HologramsAPI.unregisterPlaceholder(holographicPlaceholders, placeholder);
+            placeholderRegistry.getRegister().unregisterPlaceholder(holographicPlaceholders, placeholder);
         }
         for(String placeholder : userplaceholders){
-            HologramsAPI.unregisterPlaceholder(holographicPlaceholders, placeholder);
+            placeholderRegistry.getRegister().unregisterPlaceholder(holographicPlaceholders, placeholder);
         }
     }
 

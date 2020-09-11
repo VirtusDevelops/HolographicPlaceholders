@@ -1,10 +1,13 @@
 package com.neutralplasma.holographicPlaceholders.addons.baltop;
 
-import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
-import com.gmail.filoghost.holographicdisplays.api.placeholder.PlaceholderReplacer;
 import com.neutralplasma.holographicPlaceholders.HolographicPlaceholders;
 import com.neutralplasma.holographicPlaceholders.addons.Addon;
+import com.neutralplasma.holographicPlaceholders.placeholder.PlaceholderRegistry;
+import com.neutralplasma.holographicPlaceholders.placeholder.PlaceholderReplacer;
+import com.neutralplasma.holographicPlaceholders.storage.DataStorage;
 import com.neutralplasma.holographicPlaceholders.utils.BalanceFormater;
+import com.neutralplasma.holographicPlaceholders.utils.PluginHook;
+import eu.virtusdevelops.virtuscore.managers.FileManager;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -14,19 +17,20 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.*;
 import java.util.stream.Collectors;
 
-    /*
-        TODO:
-         - ADD SIGNS
-     */
 public class BalTopAddon extends Addon {
 
     private HolographicPlaceholders holographicPlaceholders;
+    private PlaceholderRegistry placeholderRegistry;
+    private FileManager fileManager;
+    private DataStorage dataStorage;
+
     private HashMap<String, Double> playersBalances = new HashMap<>();
     private HashMap<String, Double> sorted = new HashMap<>();
 
 
     private ArrayList<Double> values = new ArrayList<>();
     private ArrayList<String> users = new ArrayList<>();
+
 
     private List<String> excludedPlayers;
     private List<String> balplaceholders = new ArrayList<>();
@@ -39,23 +43,37 @@ public class BalTopAddon extends Addon {
     private BukkitTask offlineUpdater;
 
 
-    public BalTopAddon(HolographicPlaceholders holographicPlaceholders, String name){
+
+    public BalTopAddon(HolographicPlaceholders holographicPlaceholders,FileManager fileManager,DataStorage dataStorage,
+                       String name, PlaceholderRegistry placeholderRegistry){
         this.holographicPlaceholders = holographicPlaceholders;
+        this.fileManager = fileManager;
+        this.dataStorage = dataStorage;
         this.name = name;
+        this.placeholderRegistry = placeholderRegistry;
+        this.setHook(PluginHook.BOTH);
         excludedPlayers = holographicPlaceholders.getConfig().getStringList("BalTop.excluded-users");
     }
 
     @Override
     public void onEnable() {
+
+
+
         startBaltop();
         registerPlaceholders();
+
         super.onEnable();
+
     }
     
     @Override
     public void onDisable() {
+
         unRegisterPlaceholders();
         stopBaltop();
+
+
         super.onDisable();
     }
 
@@ -64,9 +82,8 @@ public class BalTopAddon extends Addon {
         balanceRegister = new BukkitRunnable() {
             public void run() {
                 for (OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
-                    if(!(excludedPlayers.contains(offlinePlayer.getName()))){
+                    if(!(excludedPlayers.contains(offlinePlayer.getName())) && offlinePlayer.getName() != null){
                         double playerbalance = holographicPlaceholders.getEconomy().getBalance(offlinePlayer);
-                        //UUID playersuuid = offlinePlayer.getUniqueId();
                         playersBalances.put(offlinePlayer.getName(), playerbalance);
                     }
                 }
@@ -82,11 +99,11 @@ public class BalTopAddon extends Addon {
                 values = new ArrayList<>(sorted.values());
                 users = new ArrayList<>(sorted.keySet());
 
+
             }
         }.runTaskAsynchronously(holographicPlaceholders);
     }
     // =================================================================================================================
-
 
     public void onlineBalanceUpdater() { // Update online players balance.
         long delay = holographicPlaceholders.getConfig().getLong("BalTop.delay");
@@ -128,7 +145,7 @@ public class BalTopAddon extends Addon {
             @Override
             public void run() {
                 for(OfflinePlayer player : Bukkit.getOfflinePlayers()){
-                    if(!(excludedPlayers.contains(player.getName()))){
+                    if(!(excludedPlayers.contains(player.getName())) && player.getName() != null){
                             double playerbalance;
                             try {
                                 playerbalance = holographicPlaceholders.getEconomy().getBalance(player);
@@ -189,35 +206,38 @@ public class BalTopAddon extends Addon {
         for (int index = 0; index < balplaceholders.size(); ++index) {
             String replacedplaceholder = balplaceholders.get(index);
             int i = index;
-            HologramsAPI.registerPlaceholder(holographicPlaceholders, replacedplaceholder, delay, new
-                    PlaceholderReplacer() {
-                        @Override
-                        public String update() {
-                            return BalanceFormater.formatValue(format, getValue(i));
-                        }
-                    });
+
+            placeholderRegistry.getRegister().registerPlaceholder(holographicPlaceholders, replacedplaceholder, delay, new PlaceholderReplacer() {
+                @Override
+                public String update() {
+                    return BalanceFormater.formatValue(format, getValue(i));
+                }
+            });
+
         }
 
         for (int index = 0; index < userplaceholders.size(); ++index) {
             String replacedplaceholder = userplaceholders.get(index);
             int i = index;
-            HologramsAPI.registerPlaceholder(holographicPlaceholders, replacedplaceholder, delay, new
-                    PlaceholderReplacer() {
-                        @Override
-                        public String update() {
-                            //String data = getPlayer(i);
-                            return getPlayer(i);
-                        }
-                    });
+
+            placeholderRegistry.getRegister().registerPlaceholder(holographicPlaceholders, replacedplaceholder, delay, new PlaceholderReplacer() {
+                @Override
+                public String update() {
+                    return getPlayer(i);
+                }
+            });
+
         }
     }
 
     public void unRegisterPlaceholders(){
-        for(String placeholder : balplaceholders){
-            HologramsAPI.unregisterPlaceholder(holographicPlaceholders, placeholder);
+
+
+        for (String placeholder : balplaceholders) {
+            placeholderRegistry.getRegister().unregisterPlaceholder(holographicPlaceholders, placeholder);
         }
-        for(String placeholder : userplaceholders){
-            HologramsAPI.unregisterPlaceholder(holographicPlaceholders, placeholder);
+        for (String placeholder : userplaceholders) {
+            placeholderRegistry.getRegister().unregisterPlaceholder(holographicPlaceholders, placeholder);
         }
     }
 
@@ -254,6 +274,5 @@ public class BalTopAddon extends Addon {
         }
         return 0;
     }
-
 
 }

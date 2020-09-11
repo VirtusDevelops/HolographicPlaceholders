@@ -1,5 +1,6 @@
 package com.neutralplasma.holographicPlaceholders.utils;
 
+
 import java.text.DecimalFormat;
 
 public class BalanceFormater {
@@ -14,7 +15,7 @@ public class BalanceFormater {
     }
 
     public static String formatNumbers(Double number){
-        DecimalFormat dformater = new DecimalFormat("###,###,###,###.###");
+        DecimalFormat dformater = new DecimalFormat("###,###,###,###,###.###");
 
         String formated = dformater.format(number);
 
@@ -35,9 +36,10 @@ public class BalanceFormater {
     }
 
     public static String formatValue(int format, double value){
+
         switch(format){
             case 1: return formatDecimals(value);
-            case 2: return formatNumbers(value);
+            case 2: return formatNumbers(value); // STOP
             case 3: return formatNames(value);
         }
         return "";

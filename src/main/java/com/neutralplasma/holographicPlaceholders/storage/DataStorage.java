@@ -1,15 +1,11 @@
 package com.neutralplasma.holographicPlaceholders.storage;
 
 import com.neutralplasma.holographicPlaceholders.HolographicPlaceholders;
-import com.neutralplasma.holographicPlaceholders.utils.TextFormater;
 import eu.virtusdevelops.virtuscore.utils.TextUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitScheduler;
 
-import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.IOException;
 
@@ -65,12 +61,7 @@ public class DataStorage {
     }
 
     public void startSaver(){
-        Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
-            @Override
-            public void run() {
-                saveData();
-            }
-        }, 0L, 1500L);
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, this::saveData, 0L, 1500L);
 
     }
 

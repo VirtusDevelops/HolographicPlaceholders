@@ -1,8 +1,10 @@
 package com.neutralplasma.holographicPlaceholders.addons;
 
-import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
-import com.gmail.filoghost.holographicdisplays.api.placeholder.PlaceholderReplacer;
+
 import com.neutralplasma.holographicPlaceholders.HolographicPlaceholders;
+import com.neutralplasma.holographicPlaceholders.placeholder.PlaceholderRegistry;
+import com.neutralplasma.holographicPlaceholders.placeholder.PlaceholderReplacer;
+import com.neutralplasma.holographicPlaceholders.utils.PluginHook;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,13 +12,16 @@ import java.util.List;
 public class PlaceholderAPI extends Addon {
     private HolographicPlaceholders holographicPlaceholders;
     private String placeholder;
+    private PlaceholderRegistry placeholderRegistry;
 
-    public PlaceholderAPI(HolographicPlaceholders holographicPlaceholders){
+    public PlaceholderAPI(HolographicPlaceholders holographicPlaceholders, PlaceholderRegistry placeholderRegistry){
         this.holographicPlaceholders = holographicPlaceholders;
+        this.placeholderRegistry = placeholderRegistry;
         placeholders = cast(holographicPlaceholders.getConfig().getStringList("placeholderAPI.placeholders"));
+        this.setHook(PluginHook.HOLOGRAPHICDISPLAYS);
     }
 
-    private List<String> placeholders = new ArrayList<>();
+    private List<String> placeholders;
 
     @SuppressWarnings("unchecked")
     public static <T extends List<?>> T cast(Object obj) {
@@ -44,7 +49,7 @@ public class PlaceholderAPI extends Addon {
             long delay = holographicPlaceholders.getConfig().getLong("placeholderAPI.delay");
             int i = index;
 
-            HologramsAPI.registerPlaceholder(holographicPlaceholders, unformatedPlaceholder, delay, new PlaceholderReplacer() {
+            placeholderRegistry.getRegister().registerPlaceholder(holographicPlaceholders, unformatedPlaceholder, delay, new PlaceholderReplacer() {
                 @Override
                 public String update() {
                     placeholder = placeholders.get(i);
@@ -52,12 +57,13 @@ public class PlaceholderAPI extends Addon {
                     return placeholder;
                 }
             });
+
         }
     }
 
     public void unregisterPlaceholders(){
         for(String placeholder : placeholders){
-            HologramsAPI.unregisterPlaceholder(holographicPlaceholders, placeholder);
+            placeholderRegistry.getRegister().unregisterPlaceholder(holographicPlaceholders, placeholder);
         }
     }
 }

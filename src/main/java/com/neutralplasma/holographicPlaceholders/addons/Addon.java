@@ -1,6 +1,7 @@
 package com.neutralplasma.holographicPlaceholders.addons;
 
 import com.neutralplasma.holographicPlaceholders.storage.SignLocation;
+import com.neutralplasma.holographicPlaceholders.utils.PluginHook;
 
 import java.util.HashMap;
 
@@ -8,14 +9,15 @@ public abstract class Addon {
 
     public String name = "none";
 
-    private HashMap<SignLocation, Integer> signs = new HashMap<>();
-    private HashMap<SignLocation, Integer> heads = new HashMap<>();
-
     private boolean isEnabled = false;
+
+    private PluginHook hook = PluginHook.BOTH;
 
     public boolean isEnabled(){
         return this.isEnabled;
     }
+
+    public PluginHook getHook() { return this.hook; }
 
     public void onEnable(){
         this.isEnabled = true;
@@ -33,52 +35,7 @@ public abstract class Addon {
         this.name = name;
     }
 
-    public boolean addSign(SignLocation signLocation, int position){
-        if(signs.containsKey(signLocation)){
-            return false;
-        }
-        signs.put(signLocation, position);
-        return true;
+    public void setHook(PluginHook hook) {
+        this.hook = hook;
     }
-
-    public void addSigns(HashMap<SignLocation, Integer> signs){
-        this.signs = signs;
-    }
-
-    public boolean removeSign(SignLocation signLocation){
-        for(SignLocation location : signs.keySet()){
-            if(location.toString().equalsIgnoreCase(signLocation.toString())){
-                signs.remove(location);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public HashMap<SignLocation, Integer> getSigns(){
-        return this.signs;
-    }
-
-    public boolean addHead(SignLocation signLocation, int position){
-        if(heads.containsKey(signLocation)){
-            return false;
-        }
-        heads.put(signLocation, position);
-        return true;
-    }
-
-    public  void  addHeads(HashMap<SignLocation, Integer> signs){
-        this.heads = signs;
-    }
-
-    public boolean removeHead(SignLocation signLocation){
-        for(SignLocation location : heads.keySet()){
-            if(location.toString().equalsIgnoreCase(signLocation.toString())){
-                heads.remove(location);
-                return true;
-            }
-        }
-        return false;
-    }
-
 }

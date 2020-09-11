@@ -1,0 +1,17 @@
+example:
+  speed: 0.5
+  frames:
+    - '<pulse>Holographic placeholders example</pulse>' # 1.16 +  only
+pauser:
+  speed: 0.5
+  frames:
+    - "<pause times=30>This text will be paused</pause>"
+glow:
+  speed: 0.5
+  frames:
+    - "<glow size=5 normal=&f&l start=#42f54e&l middle=#42f5c2&l end=#42f54e&l pause=10>&lGlowing HolographicPlaceholders.</glow>"
+
+# NOTICE: To use these placeholders, you need PlaceholderAPI, ProtocolLib and the correct extensions
+# /papi ecloud download Player
+# /papi ecloud download Server
+# /papi reload

@@ -1,14 +1,14 @@
 package com.neutralplasma.holographicPlaceholders.addons.statistics;
 
-import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
-import com.gmail.filoghost.holographicdisplays.api.placeholder.PlaceholderReplacer;
 import com.neutralplasma.holographicPlaceholders.HolographicPlaceholders;
+import com.neutralplasma.holographicPlaceholders.placeholder.PlaceholderRegistry;
+import com.neutralplasma.holographicPlaceholders.placeholder.PlaceholderReplacer;
 import com.neutralplasma.holographicPlaceholders.storage.DataStorage;
 import com.neutralplasma.holographicPlaceholders.storage.SignLocation;
+import com.neutralplasma.holographicPlaceholders.utils.PluginHook;
 import com.neutralplasma.holographicPlaceholders.utils.TextFormater;
 import eu.virtusdevelops.virtuscore.compatibility.ServerVersion;
 import eu.virtusdevelops.virtuscore.managers.FileManager;
-import eu.virtusdevelops.virtuscore.utils.HexUtil;
 import eu.virtusdevelops.virtuscore.utils.TextUtil;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 public class Module extends BukkitRunnable {
 
     private String placeholder;
+    private PlaceholderRegistry placeholderRegistry;
 
     private int size;
     private int placeholderdelay;
@@ -38,12 +39,12 @@ public class Module extends BukkitRunnable {
     private DataStorage dataStorage;
     private FileManager fileManager;
 
-    private HashMap<UUID, Long> data = new HashMap<>();
+    private HashMap<UUID, Double> data = new HashMap<>();
     private HashMap<SignLocation, Integer> signs = new HashMap<>();
     private HashMap<SignLocation, Integer> heads = new HashMap<>();
-    private LinkedHashMap<UUID, Long> sorted = new LinkedHashMap<>();
+    private LinkedHashMap<UUID, Double> sorted = new LinkedHashMap<>();
 
-    private ArrayList<Long> values = new ArrayList<>();
+    private ArrayList<Double> values = new ArrayList<>();
     private ArrayList<UUID> users = new ArrayList<>();
 
 
@@ -56,7 +57,7 @@ public class Module extends BukkitRunnable {
     public Module(String placeholder, long interval, int size, String type, int format, int placeholderdelay,
                   boolean doSigns, boolean doHeads,
                   DataStorage dataStorage, HolographicPlaceholders holographicPlaceholders,
-                  FileManager fileManager){
+                  FileManager fileManager, PlaceholderRegistry placeholderRegistry){
         this.placeholder = placeholder;
         this.size = size;
         this.type = type;
@@ -66,6 +67,7 @@ public class Module extends BukkitRunnable {
         this.dataStorage = dataStorage;
         this.placeholderdelay = placeholderdelay;
         this.fileManager = fileManager;
+        this.placeholderRegistry = placeholderRegistry;
 
         preLoadData();
         registerPlaceholders(holographicPlaceholders);
@@ -82,6 +84,11 @@ public class Module extends BukkitRunnable {
             return false;
         }
         signs.put(signLocation, position);
+        List<String> data = new ArrayList<>();
+        for(SignLocation location : signs.keySet()){
+            data.add(location.toString() + ":" + signs.get(location));
+        }
+        dataStorage.getData().set("addon-data." + placeholder + ".signs", data);
         return true;
     }
 
@@ -96,6 +103,13 @@ public class Module extends BukkitRunnable {
                 return true;
             }
         }
+        // Save data.
+        List<String> data = new ArrayList<>();
+        for(SignLocation location : signs.keySet()){
+            data.add(location.toString() + ":" + signs.get(location));
+        }
+        dataStorage.getData().set("addon-data." + placeholder + ".signs", data);
+
         return false;
     }
 
@@ -108,6 +122,14 @@ public class Module extends BukkitRunnable {
             return false;
         }
         heads.put(signLocation, position);
+
+        // Save data
+        List<String> data2 = new ArrayList<>();
+        for(SignLocation location : heads.keySet()){
+            data2.add(location.toString() + ":" + heads.get(location));
+        }
+        dataStorage.getData().set("addon-data." + placeholder + ".heads", data2);
+
         return true;
     }
 
@@ -122,6 +144,13 @@ public class Module extends BukkitRunnable {
                 return true;
             }
         }
+        // Save data
+        List<String> data2 = new ArrayList<>();
+        for(SignLocation location : heads.keySet()){
+            data2.add(location.toString() + ":" + heads.get(location));
+        }
+        dataStorage.getData().set("addon-data." + placeholder + ".heads", data2);
+
         return false;
     }
 
@@ -139,14 +168,13 @@ public class Module extends BukkitRunnable {
 
 
 
-
     public void preLoadData(){
         // LOAD SAVED DATA
         ConfigurationSection section = dataStorage.getData().getConfigurationSection("data." + placeholder);
         if(section != null) {
             for (String uuid : section.getKeys(false)) {
                 UUID uuid1 = UUID.fromString(uuid);
-                long value = dataStorage.getData().getLong("data." + placeholder + "." + uuid + ".value");
+                double value = dataStorage.getData().getDouble("data." + placeholder + "." + uuid + ".value");
                 data.put(uuid1, value);
             }
         }
@@ -154,7 +182,8 @@ public class Module extends BukkitRunnable {
         // LOAD ONLINE PLAYERS DATA
         for(Player player : Bukkit.getOnlinePlayers()){
             try{
-                long value = Long.parseLong(PlaceholderAPI.setPlaceholders(player, placeholder));
+
+                double value = Double.parseDouble(PlaceholderAPI.setPlaceholders(player, placeholder));
                 data.put(player.getUniqueId(), value);
                 dataStorage.getData().set("data." + placeholder + "." + player.getUniqueId().toString() + ".value", value);
             }catch (Exception ignored){};
@@ -168,7 +197,7 @@ public class Module extends BukkitRunnable {
     public void run(){
         for(Player player : Bukkit.getOnlinePlayers()){
             try{
-                long value = Long.parseLong(PlaceholderAPI.setPlaceholders(player, placeholder));
+                double value = Double.parseDouble(PlaceholderAPI.setPlaceholders(player, placeholder));
                 data.put(player.getUniqueId(), value);
                 dataStorage.getData().set("data." + placeholder + "." + player.getUniqueId().toString() + ".value", value);
             }catch (Exception ignored){};
@@ -222,7 +251,7 @@ public class Module extends BukkitRunnable {
                         lines = TextUtil.formatList(lines, "{position}:" + pos2, "{value}:" + value, "{player}:" + playername);
                         lines = TextUtil.colorFormatList(lines);
                         if(ServerVersion.isServerVersionAtLeast(ServerVersion.V1_16)){
-                            lines = HexUtil.hexFormatList(lines);
+                            lines = TextUtil.colorFormatList(lines);
                         }
 
 
@@ -257,7 +286,7 @@ public class Module extends BukkitRunnable {
         }
     }
 
-    public long getValue(int position){
+    public double getValue(int position){
         if(values.size() > position) {
             return values.get(position);
         }
@@ -272,12 +301,14 @@ public class Module extends BukkitRunnable {
     }
 
     public void unRegisterPlaceholders(HolographicPlaceholders holographicPlaceholders){
+
         for(String placeholder : valueplaceholders){
-            HologramsAPI.unregisterPlaceholder(holographicPlaceholders, placeholder);
+            placeholderRegistry.getRegister().unregisterPlaceholder(holographicPlaceholders, placeholder);
         }
         for(String placeholder : userplaceholders){
-            HologramsAPI.unregisterPlaceholder(holographicPlaceholders, placeholder);
+            placeholderRegistry.getRegister().unregisterPlaceholder(holographicPlaceholders, placeholder);
         }
+
     }
 
     public void registerPlaceholders(HolographicPlaceholders holographicPlaceholders){
@@ -291,37 +322,38 @@ public class Module extends BukkitRunnable {
         for (int index = 0; index < valueplaceholders.size(); ++index) {
             String replacedplaceholder = valueplaceholders.get(index);
             int i = index;
-            HologramsAPI.registerPlaceholder(holographicPlaceholders, replacedplaceholder, placeholderdelay, new
-                    PlaceholderReplacer() {
-                        @Override
-                        public String update() {
-                            if(type != null) {
-                                if (type.equalsIgnoreCase("number")) {
-                                    return TextFormater.formatValue(format, getValue(i));
-                                } else if (type.equalsIgnoreCase("time")) {
-                                    return TextFormater.formatTime(getValue(i) * 1000);
-                                }
-                            }
-                            return String.valueOf(getValue(i));
+
+            placeholderRegistry.getRegister().registerPlaceholder(holographicPlaceholders, replacedplaceholder, placeholderdelay, new PlaceholderReplacer() {
+                @Override
+                public String update() {
+                    if(type != null) {
+                        if (type.equalsIgnoreCase("number")) {
+                            return TextFormater.formatValue(format, getValue(i));
+                        } else if (type.equalsIgnoreCase("time")) {
+                            return TextFormater.formatTime(getValue(i) * 1000);
                         }
-                    });
+                    }
+                    return String.valueOf(getValue(i));
+                }
+            });
         }
 
         for (int index = 0; index < userplaceholders.size(); ++index) {
             String replacedplaceholder = userplaceholders.get(index);
             int i = index;
-            HologramsAPI.registerPlaceholder(holographicPlaceholders, replacedplaceholder, placeholderdelay, new
-                    PlaceholderReplacer() {
-                        @Override
-                        public String update() {
-                            UUID data = getPlayer(i);
-                            if(data == null){
-                                return "";
-                            }else {
-                                return Bukkit.getOfflinePlayer(data).getName();
-                            }
-                        }
-                    });
+
+            placeholderRegistry.getRegister().registerPlaceholder(holographicPlaceholders, replacedplaceholder, placeholderdelay, new PlaceholderReplacer() {
+                @Override
+                public String update() {
+                    UUID data = getPlayer(i);
+                    if (data == null) {
+                        return "";
+                    } else {
+                        return Bukkit.getOfflinePlayer(data).getName();
+                    }
+                }
+            });
+
         }
 
     }

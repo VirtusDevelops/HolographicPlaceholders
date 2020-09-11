@@ -2,8 +2,7 @@ package com.neutralplasma.holographicPlaceholders.addons;
 
 import com.neutralplasma.holographicPlaceholders.HolographicPlaceholders;
 import com.neutralplasma.holographicPlaceholders.addons.baltop.BalTopAddon;
-import com.neutralplasma.holographicPlaceholders.addons.playTime.PlayTimeAddon;
-import com.neutralplasma.holographicPlaceholders.utils.TextFormater;
+import com.neutralplasma.holographicPlaceholders.addons.baltop.BalTopAddonV2;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 
@@ -11,13 +10,13 @@ public class PapiAddon extends PlaceholderExpansion {
 
     private HolographicPlaceholders holographicPlaceholders;
     private BalTopAddon balTopAddon;
-    private PlayTimeAddon playTimeAddon;
+    private BalTopAddonV2 balTopAddonV2;
 
     public PapiAddon(HolographicPlaceholders holographicPlaceholders, BalTopAddon balTopAddon,
-                     PlayTimeAddon playTimeAddon){
+                     BalTopAddonV2 balTopAddonV2){
         this.holographicPlaceholders = holographicPlaceholders;
         this.balTopAddon = balTopAddon;
-        this.playTimeAddon = playTimeAddon;
+        this.balTopAddonV2 = balTopAddonV2;
     }
 
     @Override
@@ -51,19 +50,11 @@ public class PapiAddon extends PlaceholderExpansion {
         if(identifier.equals("baltopposition")){
             return String.valueOf(balTopAddon.getPlayerPosition(player));
         }
-
-
-        if(identifier.equals("playtime")){
-            return TextFormater.formatTime(playTimeAddon.getPlayTime(player));
+        if(identifier.equals("baltopV2position")){
+            return String.valueOf(balTopAddonV2.getPlayerPosition(player));
         }
 
-        if(identifier.equals("playtime_raw")){
-            return String.valueOf(playTimeAddon.getPlayTime(player));
-        }
 
-        if(identifier.equals("playtime_position")){
-            return String.valueOf(playTimeAddon.getPosition(player));
-        }
 
 
         // %someplugin_money%
