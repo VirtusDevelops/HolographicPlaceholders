@@ -9,7 +9,7 @@ import com.neutralplasma.holographicPlaceholders.gui.actions.ClickAction;
 import com.neutralplasma.holographicPlaceholders.gui.actions.InventoryCloseAction;
 import com.neutralplasma.holographicPlaceholders.utils.TextFormater;
 import com.neutralplasma.holographicPlaceholders.utils.XMaterial;
-import eu.virtusdevelops.virtuscore.utils.TextUtil;
+import eu.virtusdevelops.virtuscore.utils.TextUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -115,7 +115,7 @@ public class RegisteredUsers {
     public void nextPage(){
         ItemStack nextPageItem = new ItemStack(Material.PAPER);
         ItemMeta itemMeta = nextPageItem.getItemMeta();
-        itemMeta.setDisplayName(TextUtil.colorFormat("&eNext page."));
+        itemMeta.setDisplayName(TextUtils.colorFormat("&eNext page."));
         nextPageItem.setItemMeta(itemMeta);
         Icon nextpage = new Icon(nextPageItem);
         nextpage.addClickAction(new ClickAction() {
@@ -133,7 +133,7 @@ public class RegisteredUsers {
         if (currentpage > 1 ) {
             ItemStack prevPage = new ItemStack(Material.PAPER);
             ItemMeta itemMeta = prevPage.getItemMeta();
-            itemMeta.setDisplayName(TextUtil.colorFormat("&ePrevious page."));
+            itemMeta.setDisplayName(TextUtils.colorFormat("&ePrevious page."));
             prevPage.setItemMeta(itemMeta);
             Icon nextpage = new Icon(prevPage);
             nextpage.addClickAction(new ClickAction() {

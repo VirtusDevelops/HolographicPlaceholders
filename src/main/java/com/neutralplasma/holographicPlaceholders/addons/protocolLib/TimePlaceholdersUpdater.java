@@ -1,9 +1,7 @@
 package com.neutralplasma.holographicPlaceholders.addons.protocolLib;
 
 import com.neutralplasma.holographicPlaceholders.placeholder.PlaceholderReplacer;
-import com.neutralplasma.holographicPlaceholders.utils.TextFormater;
-import eu.virtusdevelops.virtuscore.utils.TextUtil;
-import org.bukkit.Bukkit;
+import eu.virtusdevelops.virtuscore.utils.TextUtils;
 
 import java.util.List;
 
@@ -25,6 +23,6 @@ public class TimePlaceholdersUpdater implements PlaceholderReplacer {
         else {
             this.indexCurrent++;
         }
-        return TextUtil.colorFormat(currentFrame);
+        return TextUtils.colorFormat(currentFrame);
     }
 }

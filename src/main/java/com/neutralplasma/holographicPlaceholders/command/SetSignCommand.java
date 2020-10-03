@@ -4,7 +4,7 @@ import com.neutralplasma.holographicPlaceholders.HolographicPlaceholders;
 import com.neutralplasma.holographicPlaceholders.addons.statistics.Modulator;
 import com.neutralplasma.holographicPlaceholders.storage.SignLocation;
 import eu.virtusdevelops.virtuscore.command.AbstractCommand;
-import eu.virtusdevelops.virtuscore.utils.TextUtil;
+import eu.virtusdevelops.virtuscore.utils.TextUtils;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
@@ -33,13 +33,13 @@ public class SetSignCommand extends AbstractCommand {
             Block block = player.getTargetBlock(null, 200);
             if (block.getState() instanceof Sign) {
                 if(modulator.addSign(args[0], new SignLocation(block.getLocation()), Integer.parseInt(args[1]))){
-                    sender.sendMessage(TextUtil.colorFormat("&8[&6HPE&8] &aSuccessfully set sign."));
+                    sender.sendMessage(TextUtils.colorFormat("&8[&6HPE&8] &aSuccessfully set sign."));
                 }else{
-                    sender.sendMessage(TextUtil.colorFormat("&8[&6HPE&8] &cThis sign is already set as leaderboard sign."));
+                    sender.sendMessage(TextUtils.colorFormat("&8[&6HPE&8] &cThis sign is already set as leaderboard sign."));
                 }
                 return ReturnType.SUCCESS;
             }else{
-                sender.sendMessage(TextUtil.colorFormat("&8[&6HPE&8] &cThis is not a sign."));
+                sender.sendMessage(TextUtils.colorFormat("&8[&6HPE&8] &cThis is not a sign."));
                 return ReturnType.SUCCESS;
             }
         }

@@ -8,9 +8,8 @@ import com.neutralplasma.holographicPlaceholders.gui.InventoryCreator;
 import com.neutralplasma.holographicPlaceholders.gui.actions.ClickAction;
 import com.neutralplasma.holographicPlaceholders.gui.actions.LeftClickAction;
 import com.neutralplasma.holographicPlaceholders.gui.actions.RightClickAction;
-import com.neutralplasma.holographicPlaceholders.utils.TextFormater;
 import com.neutralplasma.holographicPlaceholders.utils.XMaterial;
-import eu.virtusdevelops.virtuscore.utils.TextUtil;
+import eu.virtusdevelops.virtuscore.utils.TextUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -43,16 +42,16 @@ public class MainGUI {
         for(Addon addon : holographicPlaceholders.getAddons().keySet()){
             ItemStack item = XMaterial.BOOK.parseItem();
             ItemMeta itemMeta = item.getItemMeta();
-            itemMeta.setDisplayName(TextUtil.colorFormat("&e" + addon.getName()));
+            itemMeta.setDisplayName(TextUtils.colorFormat("&e" + addon.getName()));
             List<String> lore = new ArrayList<>();
-            lore.add(TextUtil.colorFormat("&7"));
-            lore.add(TextUtil.colorFormat("&7R-Click to edit."));
-            lore.add(TextUtil.colorFormat("&7L-Click to &aEnable&7/&cDisable."));
-            lore.add(TextUtil.colorFormat("&7"));
+            lore.add(TextUtils.colorFormat("&7"));
+            lore.add(TextUtils.colorFormat("&7R-Click to edit."));
+            lore.add(TextUtils.colorFormat("&7L-Click to &aEnable&7/&cDisable."));
+            lore.add(TextUtils.colorFormat("&7"));
             if(addon.isEnabled()) {
-                lore.add(TextUtil.colorFormat("&7Currently: &aEnabled"));
+                lore.add(TextUtils.colorFormat("&7Currently: &aEnabled"));
             }else{
-                lore.add(TextUtil.colorFormat("&7Currently: &cDisabled"));
+                lore.add(TextUtils.colorFormat("&7Currently: &cDisabled"));
             }
             itemMeta.setLore(lore);
             item.setItemMeta(itemMeta);

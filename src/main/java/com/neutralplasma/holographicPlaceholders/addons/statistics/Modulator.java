@@ -7,7 +7,7 @@ import com.neutralplasma.holographicPlaceholders.storage.DataStorage;
 import com.neutralplasma.holographicPlaceholders.storage.SignLocation;
 import com.neutralplasma.holographicPlaceholders.utils.PluginHook;
 import eu.virtusdevelops.virtuscore.managers.FileManager;
-import eu.virtusdevelops.virtuscore.utils.TextUtil;
+import eu.virtusdevelops.virtuscore.utils.TextUtils;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -142,7 +142,7 @@ public class Modulator extends Addon {
 
                 module.run();
             }else{
-                Bukkit.getConsoleSender().sendMessage(TextUtil.colorFormat("&8[&6HPE&8]&7Failed loading: " + placeholder + " (Placeholder doesn't exist or module is not installed!)"));
+                Bukkit.getConsoleSender().sendMessage(TextUtils.colorFormat("&8[&6HPE&8]&7Failed loading: " + placeholder + " (Placeholder doesn't exist or module is not installed!)"));
             }
         }
     }

@@ -7,22 +7,18 @@ import com.neutralplasma.holographicPlaceholders.addons.*;
 import com.neutralplasma.holographicPlaceholders.addons.baltop.BalTopAddonV2;
 import com.neutralplasma.holographicPlaceholders.addons.protocolLib.ProtocolHook;
 import com.neutralplasma.holographicPlaceholders.addons.statistics.Modulator;
-import com.neutralplasma.holographicPlaceholders.animations.AnimationRegistery;
-import com.neutralplasma.holographicPlaceholders.animations.AnimationReplacer;
-import com.neutralplasma.holographicPlaceholders.animations.PlaceholderRegistery;
 import com.neutralplasma.holographicPlaceholders.command.*;
 import com.neutralplasma.holographicPlaceholders.events.CloseInventoryEvent;
 import com.neutralplasma.holographicPlaceholders.events.InventoryOpenEvent;
 import com.neutralplasma.holographicPlaceholders.events.OnClickEvent;
 import com.neutralplasma.holographicPlaceholders.gui.Handler;
 import com.neutralplasma.holographicPlaceholders.placeholder.PlaceholderRegistry;
-import com.neutralplasma.holographicPlaceholders.storage.AnimationLoader;
 import com.neutralplasma.holographicPlaceholders.storage.DataStorage;
 import com.neutralplasma.holographicPlaceholders.utils.*;
 import eu.virtusdevelops.virtuscore.command.CommandManager;
 import eu.virtusdevelops.virtuscore.managers.FileManager;
 import eu.virtusdevelops.virtuscore.utils.FileLocation;
-import eu.virtusdevelops.virtuscore.utils.TextUtil;
+import eu.virtusdevelops.virtuscore.utils.TextUtils;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
@@ -39,9 +35,6 @@ public class HolographicPlaceholders extends JavaPlugin {
     private DataStorage dataStorage;
     private FileManager fileManager;
     private CommandManager commandManager;
-    private AnimationRegistery animationRegistery;
-    private PlaceholderRegistery placeholderRegistery;
-    private AnimationLoader animationLoader;
     private PluginHook pluginHook;
     private PlaceholderRegistry placeholderRegistry;
     Metrics metrics;
@@ -55,7 +48,7 @@ public class HolographicPlaceholders extends JavaPlugin {
     @Override
     public void onEnable() {
         ConsoleCommandSender sender = Bukkit.getConsoleSender();
-        sender.sendMessage(TextUtil.colorFormat("&e==================[ &7Starting &e]=================="));
+        sender.sendMessage(TextUtils.colorFormat("&e==================[ &7Starting &e]=================="));
         long time = System.currentTimeMillis();
         PluginManager pm = Bukkit.getPluginManager();
         // Check if HologramsPlugin is present.
@@ -76,8 +69,7 @@ public class HolographicPlaceholders extends JavaPlugin {
         // Loads configuration files.
         configUtil = new ConfigUtil(this);
         this.fileManager = new FileManager(this, new LinkedHashSet<>(Arrays.asList(
-                FileLocation.of("signs.yml", true, false),
-                FileLocation.of("animations.yml", true, false)
+                FileLocation.of("signs.yml", true, false)
         )));
         this.fileManager.loadFiles();
 
@@ -92,7 +84,6 @@ public class HolographicPlaceholders extends JavaPlugin {
 
         registerAddons();
 
-        registerAnimations();
 
         // Gui stuff that needs to be recoded.
         handler = new Handler(this);
@@ -102,7 +93,7 @@ public class HolographicPlaceholders extends JavaPlugin {
         registerCommands();
         time = (time - System.currentTimeMillis())*-1;
         //this.getLogger().setLevel(Level.INFO);
-        sender.sendMessage(TextUtil.colorFormat("&e=================[ &7Done: &e" + time + "&7ms &e]================="));
+        sender.sendMessage(TextUtils.colorFormat("&e=================[ &7Done: &e" + time + "&7ms &e]================="));
     }
 
     @Override
@@ -116,7 +107,7 @@ public class HolographicPlaceholders extends JavaPlugin {
         for(Addon addon : addons.keySet()){
             if(addon.isEnabled()) {
                 addon.onDisable();
-                Bukkit.getConsoleSender().sendMessage(TextUtil.colorFormat("&8[&eHPE&8] &7Disabled: &e" + addon.getName()));
+                Bukkit.getConsoleSender().sendMessage(TextUtils.colorFormat("&8[&eHPE&8] &7Disabled: &e" + addon.getName()));
                 if(addon.getName().equals("ProtocolLib")) {
                     metrics.addCustomChart(new Metrics.SimplePie("protocollib_enabled", () -> "False"));
                 }
@@ -159,7 +150,7 @@ public class HolographicPlaceholders extends JavaPlugin {
             if (this.getConfig().getBoolean("addons." + addons.get(addon))) {
                 if (!addon.isEnabled() && addon.getHook().shouldEnable(pluginHook)) {
                     addon.onEnable();
-                    Bukkit.getConsoleSender().sendMessage(TextUtil.colorFormat("&8[&eHPE&8] &7Enabled: &e" + addon.getName()));
+                    Bukkit.getConsoleSender().sendMessage(TextUtils.colorFormat("&8[&eHPE&8] &7Enabled: &e" + addon.getName()));
                     if (addon.getName().equals("ProtocolLib")) {
                         metrics.addCustomChart(new Metrics.SimplePie("protocollib_enabled", () -> "True"));
                     }
@@ -206,7 +197,7 @@ public class HolographicPlaceholders extends JavaPlugin {
     // Reload
     public long reload(){
         ConsoleCommandSender sender = Bukkit.getConsoleSender();
-        sender.sendMessage(TextUtil.colorFormat("&e==================[ &7Reload &e]=================="));
+        sender.sendMessage(TextUtils.colorFormat("&e==================[ &7Reload &e]=================="));
         long time = System.currentTimeMillis();
         reloadConfig();
 
@@ -216,24 +207,19 @@ public class HolographicPlaceholders extends JavaPlugin {
 
 
 
-        placeholderRegistery.unregisterPlaceholders();
 
         unregisterAddons();
         registerAddons();
 
-        animationRegistery.reload();
-        animationLoader.reload();
-
-
         time = (time - System.currentTimeMillis())*-1;
-        sender.sendMessage(TextUtil.colorFormat("&e=================[ &7Done: &e" + time + "&7ms &e]================="));
+        sender.sendMessage(TextUtils.colorFormat("&e=================[ &7Done: &e" + time + "&7ms &e]================="));
         return time;
     }
 
     public void enableAddon(Addon addon){
         if(addon.getHook().shouldEnable(pluginHook)) {
             addon.onEnable();
-            Bukkit.getConsoleSender().sendMessage(TextUtil.colorFormat("&8[&eHPE&8] &7Enabled: &e" + addon.getName()));
+            Bukkit.getConsoleSender().sendMessage(TextUtils.colorFormat("&8[&eHPE&8] &7Enabled: &e" + addon.getName()));
             if (addon.getName().equals("ProtocolLib")) {
                 metrics.addCustomChart(new Metrics.SimplePie("protocollib_enabled", () -> "True"));
             }
@@ -245,28 +231,12 @@ public class HolographicPlaceholders extends JavaPlugin {
 
     public void disableAddon(Addon addon){
         addon.onDisable();
-        Bukkit.getConsoleSender().sendMessage(TextUtil.colorFormat("&8[&eHPE&8] &7Disabled: &e" + addon.getName()));
+        Bukkit.getConsoleSender().sendMessage(TextUtils.colorFormat("&8[&eHPE&8] &7Disabled: &e" + addon.getName()));
         if(addon.getName().equals("ProtocolLib")) {
             metrics.addCustomChart(new Metrics.SimplePie("protocollib_enabled", () -> "False"));
         }
     }
 
-    public void registerAnimations(){
-        animationRegistery = new AnimationRegistery();
-        AnimationReplacer.setAnimationRegistry(animationRegistery);
-        placeholderRegistery = new PlaceholderRegistery(this, placeholderRegistry);
-
-        animationLoader = new AnimationLoader(this, fileManager);
-        animationLoader.reload();
-    }
-
-    public PlaceholderRegistery getPlaceholderRegistery() {
-        return placeholderRegistery;
-    }
-
-    public AnimationRegistery getAnimationRegistry() {
-        return animationRegistery;
-    }
 
     private void registerCommands() {
 

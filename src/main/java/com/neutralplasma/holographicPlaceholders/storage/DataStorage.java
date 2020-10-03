@@ -1,7 +1,7 @@
 package com.neutralplasma.holographicPlaceholders.storage;
 
 import com.neutralplasma.holographicPlaceholders.HolographicPlaceholders;
-import eu.virtusdevelops.virtuscore.utils.TextUtil;
+import eu.virtusdevelops.virtuscore.utils.TextUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -33,11 +33,11 @@ public class DataStorage {
                 dataFile.createNewFile();
                 dataConfiguration = YamlConfiguration.loadConfiguration(dataFile);
                 plugin.saveResource("data.yml", true);
-                Bukkit.getConsoleSender().sendMessage(TextUtil.colorFormat("&aSuccessfully created data.yml file!"));
+                Bukkit.getConsoleSender().sendMessage(TextUtils.colorFormat("&aSuccessfully created data.yml file!"));
 
 
             }catch (IOException e){
-                Bukkit.getConsoleSender().sendMessage(TextUtil.colorFormat("&cFailed to create data.yml file, Error: &f" + e.getMessage()));
+                Bukkit.getConsoleSender().sendMessage(TextUtils.colorFormat("&cFailed to create data.yml file, Error: &f" + e.getMessage()));
 
             }
 
@@ -56,7 +56,7 @@ public class DataStorage {
             dataConfiguration.save(dataFile);
             //Bukkit.getConsoleSender().sendMessage(TextUtil.colorFormat("&aSuccessfully saved data.yml file."));
         }catch(IOException e){
-            Bukkit.getConsoleSender().sendMessage(TextUtil.colorFormat("&cFailed to save data.yml file, Error: &f" + e.getMessage()));
+            Bukkit.getConsoleSender().sendMessage(TextUtils.colorFormat("&cFailed to save data.yml file, Error: &f" + e.getMessage()));
         }
     }
 
@@ -67,6 +67,6 @@ public class DataStorage {
 
     public void reloadData() {
         dataConfiguration = YamlConfiguration.loadConfiguration(dataFile);
-        Bukkit.getConsoleSender().sendMessage(TextUtil.colorFormat("&aReloaded data.yml file."));
+        Bukkit.getConsoleSender().sendMessage(TextUtils.colorFormat("&aReloaded data.yml file."));
     }
 }

@@ -7,9 +7,8 @@ import com.neutralplasma.holographicPlaceholders.gui.InventoryCreator;
 import com.neutralplasma.holographicPlaceholders.gui.actions.ClickAction;
 import com.neutralplasma.holographicPlaceholders.gui.actions.InventoryCloseAction;
 import com.neutralplasma.holographicPlaceholders.utils.AbstractChatUtil;
-import com.neutralplasma.holographicPlaceholders.utils.TextFormater;
 import com.neutralplasma.holographicPlaceholders.utils.XMaterial;
-import eu.virtusdevelops.virtuscore.utils.TextUtil;
+import eu.virtusdevelops.virtuscore.utils.TextUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -51,11 +50,11 @@ public class BalTopEdit {
     public void registeredUsers(){
         ItemStack item = XMaterial.CHEST.parseItem();
         ItemMeta itemMeta = item.getItemMeta();
-        itemMeta.setDisplayName(TextUtil.colorFormat("&eRegistered Users"));
+        itemMeta.setDisplayName(TextUtils.colorFormat("&eRegistered Users"));
         List<String> lore = new ArrayList<>();
-        lore.add(TextUtil.colorFormat("&7"));
-        lore.add(TextUtil.colorFormat("&7Click to see."));
-        lore.add(TextUtil.colorFormat("&7"));
+        lore.add(TextUtils.colorFormat("&7"));
+        lore.add(TextUtils.colorFormat("&7Click to see."));
+        lore.add(TextUtils.colorFormat("&7"));
         itemMeta.setLore(lore);
         item.setItemMeta(itemMeta);
         Icon icon = new Icon(item);
@@ -72,23 +71,23 @@ public class BalTopEdit {
     public void sizeButton(){
         ItemStack item = XMaterial.WRITABLE_BOOK.parseItem();
         ItemMeta itemMeta = item.getItemMeta();
-        itemMeta.setDisplayName(TextUtil.colorFormat("&eBaltop Size"));
+        itemMeta.setDisplayName(TextUtils.colorFormat("&eBaltop Size"));
         int currentsize = holographicPlaceholders.getConfig().getInt("BalTop.size");
         List<String> lore = new ArrayList<>();
-        lore.add(TextUtil.colorFormat("&7"));
-        lore.add(TextUtil.colorFormat("&7Click to modify."));
-        lore.add(TextUtil.colorFormat("&7"));
-        lore.add(TextUtil.colorFormat("&7Current size: &e{0}&7.").replace("{0}", String.valueOf(currentsize)));
-        lore.add(TextUtil.colorFormat("&7"));
+        lore.add(TextUtils.colorFormat("&7"));
+        lore.add(TextUtils.colorFormat("&7Click to modify."));
+        lore.add(TextUtils.colorFormat("&7"));
+        lore.add(TextUtils.colorFormat("&7Current size: &e{0}&7.").replace("{0}", String.valueOf(currentsize)));
+        lore.add(TextUtils.colorFormat("&7"));
         itemMeta.setLore(lore);
         item.setItemMeta(itemMeta);
         Icon icon = new Icon(item);
         icon.addClickAction(new ClickAction() {
             @Override
             public void execute(Player player) {
-                player.sendMessage(TextUtil.colorFormat("&7"));
-                player.sendMessage(TextUtil.colorFormat("&7Enter a valid size number."));
-                player.sendMessage(TextUtil.colorFormat("&7"));
+                player.sendMessage(TextUtils.colorFormat("&7"));
+                player.sendMessage(TextUtils.colorFormat("&7Enter a valid size number."));
+                player.sendMessage(TextUtils.colorFormat("&7"));
                 ic.clearCloseActions();
                 AbstractChatUtil chat = new AbstractChatUtil(player, event -> {
                     String enteredinfo = event.getMessage();
@@ -98,7 +97,7 @@ public class BalTopEdit {
                         entered = Integer.valueOf(enteredinfo);
                     } catch (Exception error) {
                         entered = 10;
-                        player.sendMessage(TextUtil.colorFormat("&cPlease enter a valid number!"));
+                        player.sendMessage(TextUtils.colorFormat("&cPlease enter a valid number!"));
                     }
 
                     holographicPlaceholders.getConfig().set("BalTop.size", entered);
@@ -118,23 +117,23 @@ public class BalTopEdit {
     public void onlineRefreshButton(){
         ItemStack item = XMaterial.WRITABLE_BOOK.parseItem();
         ItemMeta itemMeta = item.getItemMeta();
-        itemMeta.setDisplayName(TextUtil.colorFormat("&eRefresh interval &7(&6Online&7)"));
+        itemMeta.setDisplayName(TextUtils.colorFormat("&eRefresh interval &7(&6Online&7)"));
         double currentsize = holographicPlaceholders.getConfig().getDouble("BalTop.delay");
         List<String> lore = new ArrayList<>();
-        lore.add(TextUtil.colorFormat("&7"));
-        lore.add(TextUtil.colorFormat("&7Click to modify."));
-        lore.add(TextUtil.colorFormat("&7"));
-        lore.add(TextUtil.colorFormat("&7Current: &e{0}&7.").replace("{0}", String.valueOf(currentsize)));
-        lore.add(TextUtil.colorFormat("&7"));
+        lore.add(TextUtils.colorFormat("&7"));
+        lore.add(TextUtils.colorFormat("&7Click to modify."));
+        lore.add(TextUtils.colorFormat("&7"));
+        lore.add(TextUtils.colorFormat("&7Current: &e{0}&7.").replace("{0}", String.valueOf(currentsize)));
+        lore.add(TextUtils.colorFormat("&7"));
         itemMeta.setLore(lore);
         item.setItemMeta(itemMeta);
         Icon icon = new Icon(item);
         icon.addClickAction(new ClickAction() {
             @Override
             public void execute(Player player) {
-                player.sendMessage(TextUtil.colorFormat("&7"));
-                player.sendMessage(TextUtil.colorFormat("&7Enter a valid refresh number."));
-                player.sendMessage(TextUtil.colorFormat("&7"));
+                player.sendMessage(TextUtils.colorFormat("&7"));
+                player.sendMessage(TextUtils.colorFormat("&7Enter a valid refresh number."));
+                player.sendMessage(TextUtils.colorFormat("&7"));
                 ic.clearCloseActions();
                 AbstractChatUtil chat = new AbstractChatUtil(player, event -> {
                     String enteredinfo = event.getMessage();
@@ -144,7 +143,7 @@ public class BalTopEdit {
                         entered = Double.valueOf(enteredinfo);
                     } catch (Exception error) {
                         entered = 10;
-                        player.sendMessage(TextUtil.colorFormat("&cPlease enter a valid number!"));
+                        player.sendMessage(TextUtils.colorFormat("&cPlease enter a valid number!"));
                     }
 
                     holographicPlaceholders.getConfig().set("BalTop.delay", entered);
@@ -163,23 +162,23 @@ public class BalTopEdit {
     public void offlineRefreshButton(){
         ItemStack item = XMaterial.WRITABLE_BOOK.parseItem();
         ItemMeta itemMeta = item.getItemMeta();
-        itemMeta.setDisplayName(TextUtil.colorFormat("&eRefresh interval &7(&6Offline&7)"));
+        itemMeta.setDisplayName(TextUtils.colorFormat("&eRefresh interval &7(&6Offline&7)"));
         double currentsize = holographicPlaceholders.getConfig().getDouble("BalTop.offline-delay");
         List<String> lore = new ArrayList<>();
-        lore.add(TextUtil.colorFormat("&7"));
-        lore.add(TextUtil.colorFormat("&7Click to modify."));
-        lore.add(TextUtil.colorFormat("&7"));
-        lore.add(TextUtil.colorFormat("&7Current: &e{0}&7.").replace("{0}", String.valueOf(currentsize)));
-        lore.add(TextUtil.colorFormat("&7"));
+        lore.add(TextUtils.colorFormat("&7"));
+        lore.add(TextUtils.colorFormat("&7Click to modify."));
+        lore.add(TextUtils.colorFormat("&7"));
+        lore.add(TextUtils.colorFormat("&7Current: &e{0}&7.").replace("{0}", String.valueOf(currentsize)));
+        lore.add(TextUtils.colorFormat("&7"));
         itemMeta.setLore(lore);
         item.setItemMeta(itemMeta);
         Icon icon = new Icon(item);
         icon.addClickAction(new ClickAction() {
             @Override
             public void execute(Player player) {
-                player.sendMessage(TextUtil.colorFormat("&7"));
-                player.sendMessage(TextUtil.colorFormat("&7Enter a valid refresh number."));
-                player.sendMessage(TextUtil.colorFormat("&7"));
+                player.sendMessage(TextUtils.colorFormat("&7"));
+                player.sendMessage(TextUtils.colorFormat("&7Enter a valid refresh number."));
+                player.sendMessage(TextUtils.colorFormat("&7"));
                 ic.clearCloseActions();
                 AbstractChatUtil chat = new AbstractChatUtil(player, event -> {
                     String enteredinfo = event.getMessage();
@@ -189,7 +188,7 @@ public class BalTopEdit {
                         entered = Double.valueOf(enteredinfo);
                     } catch (Exception error) {
                         entered = 10.0;
-                        player.sendMessage(TextUtil.colorFormat("&cPlease enter a valid number!"));
+                        player.sendMessage(TextUtils.colorFormat("&cPlease enter a valid number!"));
                     }
 
                     holographicPlaceholders.getConfig().set("BalTop.offline-delay", entered);
@@ -208,23 +207,23 @@ public class BalTopEdit {
     public void placeholderRefreshButton(){
         ItemStack item = XMaterial.PAPER.parseItem();
         ItemMeta itemMeta = item.getItemMeta();
-        itemMeta.setDisplayName(TextUtil.colorFormat("&eRefresh interval &7(&6Placeholders&7)"));
+        itemMeta.setDisplayName(TextUtils.colorFormat("&eRefresh interval &7(&6Placeholders&7)"));
         double currentsize = holographicPlaceholders.getConfig().getDouble("BalTop.placeholder-delay");
         List<String> lore = new ArrayList<>();
-        lore.add(TextUtil.colorFormat("&7"));
-        lore.add(TextUtil.colorFormat("&7Click to modify."));
-        lore.add(TextUtil.colorFormat("&7"));
-        lore.add(TextUtil.colorFormat("&7Current: &e{0}&7.").replace("{0}", String.valueOf(currentsize)));
-        lore.add(TextUtil.colorFormat("&7"));
+        lore.add(TextUtils.colorFormat("&7"));
+        lore.add(TextUtils.colorFormat("&7Click to modify."));
+        lore.add(TextUtils.colorFormat("&7"));
+        lore.add(TextUtils.colorFormat("&7Current: &e{0}&7.").replace("{0}", String.valueOf(currentsize)));
+        lore.add(TextUtils.colorFormat("&7"));
         itemMeta.setLore(lore);
         item.setItemMeta(itemMeta);
         Icon icon = new Icon(item);
         icon.addClickAction(new ClickAction() {
             @Override
             public void execute(Player player) {
-                player.sendMessage(TextUtil.colorFormat("&7"));
-                player.sendMessage(TextUtil.colorFormat("&7Enter a valid refresh number."));
-                player.sendMessage(TextUtil.colorFormat("&7"));
+                player.sendMessage(TextUtils.colorFormat("&7"));
+                player.sendMessage(TextUtils.colorFormat("&7Enter a valid refresh number."));
+                player.sendMessage(TextUtils.colorFormat("&7"));
                 ic.clearCloseActions();
                 AbstractChatUtil chat = new AbstractChatUtil(player, event -> {
                     String enteredinfo = event.getMessage();
@@ -234,7 +233,7 @@ public class BalTopEdit {
                         entered = Double.valueOf(enteredinfo);
                     } catch (Exception error) {
                         entered = 10.0;
-                        player.sendMessage(TextUtil.colorFormat("&cPlease enter a valid number!"));
+                        player.sendMessage(TextUtils.colorFormat("&cPlease enter a valid number!"));
                     }
 
                     holographicPlaceholders.getConfig().set("BalTop.placeholder-delay", entered);

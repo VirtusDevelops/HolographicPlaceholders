@@ -184,7 +184,7 @@ public class BalTopAddon extends Addon {
         if(values.size() > position) {
             return users.get(position);
         }
-        return null;
+        return "";
     }
 
 

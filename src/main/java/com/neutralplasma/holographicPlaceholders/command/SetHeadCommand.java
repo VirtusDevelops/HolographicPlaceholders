@@ -4,9 +4,8 @@ import com.neutralplasma.holographicPlaceholders.HolographicPlaceholders;
 import com.neutralplasma.holographicPlaceholders.addons.statistics.Modulator;
 import com.neutralplasma.holographicPlaceholders.storage.SignLocation;
 import eu.virtusdevelops.virtuscore.command.AbstractCommand;
-import eu.virtusdevelops.virtuscore.utils.TextUtil;
+import eu.virtusdevelops.virtuscore.utils.TextUtils;
 import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
 import org.bukkit.block.Skull;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -34,13 +33,13 @@ public class SetHeadCommand extends AbstractCommand {
             Block block = player.getTargetBlock(null, 200);
             if (block.getState() instanceof Skull) {
                 if(modulator.addHead(args[0], new SignLocation(block.getLocation()), Integer.parseInt(args[1]))){
-                    sender.sendMessage(TextUtil.colorFormat("&8[&6HPE&8] &aSuccessfully set skull/head."));
+                    sender.sendMessage(TextUtils.colorFormat("&8[&6HPE&8] &aSuccessfully set skull/head."));
                 }else{
-                    sender.sendMessage(TextUtil.colorFormat("&8[&6HPE&8] &cThis skull/head is already set as leaderboard skull/head."));
+                    sender.sendMessage(TextUtils.colorFormat("&8[&6HPE&8] &cThis skull/head is already set as leaderboard skull/head."));
                 }
                 return ReturnType.SUCCESS;
             }else{
-                sender.sendMessage(TextUtil.colorFormat("&8[&6HPE&8] &cThis is not a skull/head."));
+                sender.sendMessage(TextUtils.colorFormat("&8[&6HPE&8] &cThis is not a skull/head."));
                 return ReturnType.SUCCESS;
             }
         }

@@ -1,25 +1,28 @@
 package com.neutralplasma.holographicPlaceholders.addons.statistics;
 
+import com.comphenix.protocol.*;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.BlockPosition;
+import com.comphenix.protocol.wrappers.nbt.NbtCompound;
 import com.neutralplasma.holographicPlaceholders.HolographicPlaceholders;
 import com.neutralplasma.holographicPlaceholders.placeholder.PlaceholderRegistry;
 import com.neutralplasma.holographicPlaceholders.placeholder.PlaceholderReplacer;
 import com.neutralplasma.holographicPlaceholders.storage.DataStorage;
 import com.neutralplasma.holographicPlaceholders.storage.SignLocation;
-import com.neutralplasma.holographicPlaceholders.utils.PluginHook;
 import com.neutralplasma.holographicPlaceholders.utils.TextFormater;
-import eu.virtusdevelops.virtuscore.compatibility.ServerVersion;
+import eu.virtusdevelops.virtuscore.VirtusCore;
 import eu.virtusdevelops.virtuscore.managers.FileManager;
-import eu.virtusdevelops.virtuscore.utils.TextUtil;
+import eu.virtusdevelops.virtuscore.utils.TextUtils;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
 import org.bukkit.block.Skull;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,6 +30,7 @@ public class Module extends BukkitRunnable {
 
     private String placeholder;
     private PlaceholderRegistry placeholderRegistry;
+    private ProtocolManager protocolManager;
 
     private int size;
     private int placeholderdelay;
@@ -53,6 +57,8 @@ public class Module extends BukkitRunnable {
     private List<String> valueplaceholders = new ArrayList<>();
     private List<String> userplaceholders = new ArrayList<>();
 
+    private static final String NBT_FORMAT = "{\"text\":\"%s\"}";
+
 
     public Module(String placeholder, long interval, int size, String type, int format, int placeholderdelay,
                   boolean doSigns, boolean doHeads,
@@ -68,6 +74,7 @@ public class Module extends BukkitRunnable {
         this.placeholderdelay = placeholderdelay;
         this.fileManager = fileManager;
         this.placeholderRegistry = placeholderRegistry;
+        this.protocolManager = ProtocolLibrary.getProtocolManager();
 
         preLoadData();
         registerPlaceholders(holographicPlaceholders);
@@ -221,7 +228,66 @@ public class Module extends BukkitRunnable {
                 int position = signs.get(signLocation) - 1;
                 int pos2 = position + 1;
                 if (block.getChunk().isLoaded()) {
-                    if (block.getState() instanceof Sign) {
+
+                    List<String> lines;
+                    if (fileManager.getConfiguration("signs").contains(placeholder + "." + pos2)) {
+                        lines = fileManager.getConfiguration("signs").getStringList(placeholder + "." + pos2 + ".lines");
+                    } else {
+                        lines = fileManager.getConfiguration("signs").getStringList(placeholder + ".default.lines");
+                    }
+
+                    String playername;
+                    UUID id = getPlayer(position);
+                    if (id != null) {
+                        playername = Bukkit.getOfflinePlayer(id).getName();
+                    } else {
+                        playername = "###";
+                    }
+
+
+
+                    String value = String.valueOf(getValue(position));
+                    if (type.equalsIgnoreCase("number")) {
+                        value = TextFormater.formatValue(format, getValue(position));
+                    } else if (type.equalsIgnoreCase("time")) {
+                        value = TextFormater.formatTime(getValue(position) * 1000);
+                    }
+
+                    lines = TextUtils.formatList(lines, "{position}:" + pos2, "{value}:" + value, "{player}:" + playername);
+                    lines = TextUtils.colorFormatList(lines);
+
+
+
+
+
+
+                    PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.TILE_ENTITY_DATA);
+                    BlockPosition blockPosition = new BlockPosition(signLocation.getX(), signLocation.getY(), signLocation.getZ());
+                    packet.getBlockPositionModifier().write(0, blockPosition);
+
+                    NbtCompound nbt = (NbtCompound) packet.getNbtModifier().read(0);
+                    for(int i = 0; i < 4; i++)
+                        nbt.put("Text" + (i+1), "{\"text\":\"" + lines.get(i) + "\"}");
+                        //nbt.put("Text" + (i + 1), "{\"extra\":[{\"text\":\"" + lines.get(i) + "\"}],\"text\":\"\"}");
+
+                    nbt.put("x", signLocation.getX());
+                    nbt.put("y", signLocation.getY());
+                    nbt.put("z", signLocation.getZ());
+                    nbt.put("id", "minecraft:sign");
+
+                    packet.getIntegers().write(0, 9);
+                    packet.getNbtModifier().write(0, nbt);
+
+
+                    for(Player p : Bukkit.getOnlinePlayers()){
+                        try {
+                            protocolManager.sendServerPacket(p, packet);
+                        } catch (InvocationTargetException ignored) { }
+                    }
+
+
+                    /* OLD AND DEPRECATED */
+                    /*if (block.getState() instanceof Sign) {
                         Sign sign = (Sign) block.getState();
                         List<String> lines;
 
@@ -236,23 +302,22 @@ public class Module extends BukkitRunnable {
                         if (id != null) {
                             playername = Bukkit.getOfflinePlayer(id).getName();
                         } else {
-                            playername = "EMPTY";
+                            playername = "###";
                         }
-                        String value = null;
+
+
+
+                        String value = String.valueOf(getValue(position));
                         if (type.equalsIgnoreCase("number")) {
                             value = TextFormater.formatValue(format, getValue(position));
                         } else if (type.equalsIgnoreCase("time")) {
                             value = TextFormater.formatTime(getValue(position) * 1000);
                         }
-                        if(value == null){
-                            value = String.valueOf(getValue(position));
-                        }
 
-                        lines = TextUtil.formatList(lines, "{position}:" + pos2, "{value}:" + value, "{player}:" + playername);
-                        lines = TextUtil.colorFormatList(lines);
-                        if(ServerVersion.isServerVersionAtLeast(ServerVersion.V1_16)){
-                            lines = TextUtil.colorFormatList(lines);
-                        }
+
+                        lines = TextUtils.formatList(lines, "{position}:" + pos2, "{value}:" + value, "{player}:" + playername);
+                        lines = TextUtils.colorFormatList(lines);
+
 
 
                         for (int i = 0; i < lines.size(); i++) {
@@ -260,10 +325,11 @@ public class Module extends BukkitRunnable {
                         }
 
                         sign.update();
-                    }
+                    }*/
                 }
             }
         }
+
 
         if(doHeads){
             for(SignLocation signLocation : heads.keySet()) {

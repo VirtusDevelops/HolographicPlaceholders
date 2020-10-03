@@ -2,7 +2,7 @@ package com.neutralplasma.holographicPlaceholders.command;
 
 import com.neutralplasma.holographicPlaceholders.HolographicPlaceholders;
 import eu.virtusdevelops.virtuscore.command.AbstractCommand;
-import eu.virtusdevelops.virtuscore.utils.TextUtil;
+import eu.virtusdevelops.virtuscore.utils.TextUtils;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class ReloadCommand extends AbstractCommand {
     @Override
     protected ReturnType runCommand(CommandSender commandSender, String... strings) {
         long time = plugin.reload();
-        commandSender.sendMessage(TextUtil.colorFormat("&7Successfully reloaded! Took: &e" + time + "ms&7."));
+        commandSender.sendMessage(TextUtils.colorFormat("&7Successfully reloaded! Took: &e" + time + "ms&7."));
         return ReturnType.SUCCESS;
     }
 

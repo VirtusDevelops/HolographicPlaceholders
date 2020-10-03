@@ -4,10 +4,9 @@ import com.neutralplasma.holographicPlaceholders.HolographicPlaceholders;
 import com.neutralplasma.holographicPlaceholders.addons.statistics.Modulator;
 import com.neutralplasma.holographicPlaceholders.storage.SignLocation;
 import eu.virtusdevelops.virtuscore.command.AbstractCommand;
-import eu.virtusdevelops.virtuscore.utils.TextUtil;
+import eu.virtusdevelops.virtuscore.utils.TextUtils;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-import org.bukkit.block.Skull;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -33,14 +32,14 @@ public class RemoveSignCommand extends AbstractCommand {
             Block block = player.getTargetBlock(null, 200);
             if (block.getState() instanceof Sign) {
                 if(modulator.removeSign(args[0], new SignLocation(block.getLocation()))){
-                    sender.sendMessage(TextUtil.colorFormat("&8[&6HPE&8] &aSuccessfully removed sign."));
+                    sender.sendMessage(TextUtils.colorFormat("&8[&6HPE&8] &aSuccessfully removed sign."));
                     return ReturnType.SUCCESS;
                 }else{
-                    sender.sendMessage(TextUtil.colorFormat("&8[&6HPE&8] &cCouldn't find any sign that is set as leaderboard here."));
+                    sender.sendMessage(TextUtils.colorFormat("&8[&6HPE&8] &cCouldn't find any sign that is set as leaderboard here."));
                     return ReturnType.SUCCESS;
                 }
             }else{
-                sender.sendMessage(TextUtil.colorFormat("&8[&6HPE&8] &cThis is not a sign."));
+                sender.sendMessage(TextUtils.colorFormat("&8[&6HPE&8] &cThis is not a sign."));
                 return ReturnType.SUCCESS;
             }
         }else{

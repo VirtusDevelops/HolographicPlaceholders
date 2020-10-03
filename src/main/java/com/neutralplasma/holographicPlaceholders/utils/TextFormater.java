@@ -10,6 +10,8 @@ import java.util.TimeZone;
 public class TextFormater {
 
 
+
+
     private static String formatDecimals(Long number){
         DecimalFormat dformater = new DecimalFormat("###.##");
 

@@ -13,11 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/*
-    This code is made by SONGODA and not me!
-    For more info check their page:
-    https://songoda.com/
- */
 
 public class AbstractChatUtil implements Listener {
 
