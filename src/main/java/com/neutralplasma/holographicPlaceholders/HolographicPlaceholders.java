@@ -91,7 +91,7 @@ public class HolographicPlaceholders extends JavaPlugin {
 
         // Register commands.
         registerCommands();
-        time = (time - System.currentTimeMillis())*-1;
+        time = (System.currentTimeMillis() - time);
         //this.getLogger().setLevel(Level.INFO);
         sender.sendMessage(TextUtils.colorFormat("&e=================[ &7Done: &e" + time + "&7ms &e]================="));
     }
@@ -121,19 +121,16 @@ public class HolographicPlaceholders extends JavaPlugin {
         BalTopAddon balTopAddon = new BalTopAddon(this, fileManager, dataStorage,"BalTop", placeholderRegistry);
         BalTopAddonV2 balTopAddonV2 = new BalTopAddonV2(this, "BalTopV2", placeholderRegistry);
         Addon placeholderAddon = new PlaceholderAPI(this, placeholderRegistry);
+        Addon protocolAddon = new ProtocolHook(this, placeholderRegistry);
+
         //Addon protocolAddon = new ProtocolHook(this, placeholderRegistry);
 
         modulator = new Modulator(this, dataStorage, fileManager, placeholderRegistry);
 
         // OLD SYSTEM
-        //protocolAddon.setName("ProtocolLib");
         placeholderAddon.setName("PlaceholderAPI");
+        protocolAddon.setName("ProtocolLib");
 
-        if(Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")){
-            Addon protocolAddon = new ProtocolHook(this, placeholderRegistry);
-            protocolAddon.setName("ProtocolLib");
-            addons.put(modulator, modulator.getName());
-        }
 
 
         modulator.setName("MultiPlaceholders");
@@ -141,6 +138,7 @@ public class HolographicPlaceholders extends JavaPlugin {
 
         addons.put(balTopAddon, balTopAddon.getName()); // reworked
         addons.put(balTopAddonV2, balTopAddonV2.getName()); // reworked
+        addons.put(protocolAddon, protocolAddon.getName());
 
         //addons.put(protocolAddon, protocolAddon.getName());
         addons.put(placeholderAddon, placeholderAddon.getName());
@@ -155,7 +153,9 @@ public class HolographicPlaceholders extends JavaPlugin {
                         metrics.addCustomChart(new Metrics.SimplePie("protocollib_enabled", () -> "True"));
                     }
                 }else{
-                    getLogger().info("Not enabling " + addon.getName() + " due to it's not compatible with current holograms plugin.");
+                    Bukkit.getConsoleSender().sendMessage(TextUtils.colorFormat("&8[&eHPE&8] &cdisabled: &e" + addon.getName() + " &7Needed plugin: " + addon.getHook().toString()
+                     + " Current plugin: " + pluginHook.toString()) );
+                    //getLogger().info("Not enabling " + addon.getName() + " due to it's not compatible with current holograms plugin.");
                 }
             }
         }
