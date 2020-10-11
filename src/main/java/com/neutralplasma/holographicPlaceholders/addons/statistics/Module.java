@@ -266,7 +266,8 @@ public class Module extends BukkitRunnable {
                     packet.getBlockPositionModifier().write(0, blockPosition);
 
                     NbtCompound nbt = (NbtCompound) packet.getNbtModifier().read(0);
-                    for(int i = 0; i < 4; i++)
+
+                    for(int i = 0; i < Math.min(lines.size(), 4); i++)
                         nbt.put("Text" + (i+1), "{\"text\":\"" + lines.get(i) + "\"}");
                         //nbt.put("Text" + (i + 1), "{\"extra\":[{\"text\":\"" + lines.get(i) + "\"}],\"text\":\"\"}");
 
