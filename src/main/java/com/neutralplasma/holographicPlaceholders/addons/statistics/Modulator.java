@@ -46,6 +46,7 @@ public class Modulator extends Addon {
 
     public void stopModules(){
         for(Module module : modules){
+            module.cancel();
             module.unRegisterPlaceholders(holographicPlaceholders);
             List<String> data = new ArrayList<>();
             for(SignLocation signLocation : module.getSigns().keySet()){
@@ -58,7 +59,9 @@ public class Modulator extends Addon {
                 data2.add(signLocation.toString() + ":" + module.getHeads().get(signLocation));
             }
             dataStorage.getData().set("addon-data." + module.getPlaceholder() + ".heads", data2);
+            module.unregister();
         }
+        modules.clear();
     }
 
     public boolean addSign(String placeholder, SignLocation signLocation, int position){

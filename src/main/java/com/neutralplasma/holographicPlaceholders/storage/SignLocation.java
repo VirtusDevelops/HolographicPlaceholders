@@ -39,4 +39,12 @@ public class SignLocation {
         return world + ":" + x + ":" + y + ":" + z;
     }
 
+    public double getDistance(SignLocation location){
+        return Math.pow((location.getX() - x),2) + Math.pow((location.getY() - y ) ,2)+ Math.pow((location.getZ() - z),2);
+    }
+
+    public double getDistance(Location location){
+        return Math.pow((location.getX() - x),2) + Math.pow((location.getY() - y ) ,2)+ Math.pow((location.getZ() - z),2);
+    }
+
 }

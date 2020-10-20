@@ -9,12 +9,14 @@ import com.neutralplasma.holographicPlaceholders.placeholder.PlaceholderRegistry
 import com.neutralplasma.holographicPlaceholders.placeholder.PlaceholderReplacer;
 import com.neutralplasma.holographicPlaceholders.storage.DataStorage;
 import com.neutralplasma.holographicPlaceholders.storage.SignLocation;
+import com.neutralplasma.holographicPlaceholders.utils.IndexedLinkedHashMap;
 import com.neutralplasma.holographicPlaceholders.utils.TextFormater;
 import eu.virtusdevelops.virtuscore.VirtusCore;
 import eu.virtusdevelops.virtuscore.managers.FileManager;
 import eu.virtusdevelops.virtuscore.utils.TextUtils;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
@@ -31,6 +33,7 @@ public class Module extends BukkitRunnable {
     private String placeholder;
     private PlaceholderRegistry placeholderRegistry;
     private ProtocolManager protocolManager;
+    private HolographicPlaceholders plugin;
 
     private int size;
     private int placeholderdelay;
@@ -57,7 +60,6 @@ public class Module extends BukkitRunnable {
     private List<String> valueplaceholders = new ArrayList<>();
     private List<String> userplaceholders = new ArrayList<>();
 
-    private static final String NBT_FORMAT = "{\"text\":\"%s\"}";
 
 
     public Module(String placeholder, long interval, int size, String type, int format, int placeholderdelay,
@@ -74,16 +76,28 @@ public class Module extends BukkitRunnable {
         this.placeholderdelay = placeholderdelay;
         this.fileManager = fileManager;
         this.placeholderRegistry = placeholderRegistry;
+        this.plugin = holographicPlaceholders;
         this.protocolManager = ProtocolLibrary.getProtocolManager();
 
         preLoadData();
         registerPlaceholders(holographicPlaceholders);
 
-        this.runTaskTimer(holographicPlaceholders, 0L, interval);
+        this.runTaskTimerAsynchronously(holographicPlaceholders, 0L, interval);
     }
 
     public String getPlaceholder() {
         return placeholder;
+    }
+
+    public void unregister(){
+        data.clear();
+        signs.clear();
+        heads.clear();
+        sorted.clear();
+        values.clear();
+        users.clear();
+        valueplaceholders.clear();
+        userplaceholders.clear();
     }
 
     public boolean addSign(SignLocation signLocation, int position){
@@ -196,8 +210,17 @@ public class Module extends BukkitRunnable {
             }catch (Exception ignored){};
         }
 
+        cache();
 
+    }
 
+    public void cache(){
+        for(OfflinePlayer player: Bukkit.getOfflinePlayers()){
+            if(!data.containsKey(player.getUniqueId())) {
+                data.put(player.getUniqueId(), 0.0);
+                dataStorage.getData().set("data." + placeholder + "." + player.getUniqueId().toString() + ".value", 0.0);
+            }
+        }
     }
 
     @Override
@@ -217,6 +240,7 @@ public class Module extends BukkitRunnable {
                 .collect(Collectors.toMap(
                         Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 
+
         values = new ArrayList<>(sorted.values());
         users = new ArrayList<>(sorted.keySet());
 
@@ -229,37 +253,6 @@ public class Module extends BukkitRunnable {
                 int pos2 = position + 1;
                 if (block.getChunk().isLoaded()) {
 
-                    List<String> lines;
-                    if (fileManager.getConfiguration("signs").contains(placeholder + "." + pos2)) {
-                        lines = fileManager.getConfiguration("signs").getStringList(placeholder + "." + pos2 + ".lines");
-                    } else {
-                        lines = fileManager.getConfiguration("signs").getStringList(placeholder + ".default.lines");
-                    }
-
-                    String playername;
-                    UUID id = getPlayer(position);
-                    if (id != null) {
-                        playername = Bukkit.getOfflinePlayer(id).getName();
-                    } else {
-                        playername = "###";
-                    }
-
-
-
-                    String value = String.valueOf(getValue(position));
-                    if (type.equalsIgnoreCase("number")) {
-                        value = TextFormater.formatValue(format, getValue(position));
-                    } else if (type.equalsIgnoreCase("time")) {
-                        value = TextFormater.formatTime(getValue(position) * 1000);
-                    }
-
-                    lines = TextUtils.formatList(lines, "{position}:" + pos2, "{value}:" + value, "{player}:" + playername);
-                    lines = TextUtils.colorFormatList(lines);
-
-
-
-
-
 
                     PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.TILE_ENTITY_DATA);
                     BlockPosition blockPosition = new BlockPosition(signLocation.getX(), signLocation.getY(), signLocation.getZ());
@@ -267,9 +260,9 @@ public class Module extends BukkitRunnable {
 
                     NbtCompound nbt = (NbtCompound) packet.getNbtModifier().read(0);
 
-                    for(int i = 0; i < Math.min(lines.size(), 4); i++)
-                        nbt.put("Text" + (i+1), "{\"text\":\"" + lines.get(i) + "\"}");
-                        //nbt.put("Text" + (i + 1), "{\"extra\":[{\"text\":\"" + lines.get(i) + "\"}],\"text\":\"\"}");
+                    //for (int i = 0; i < Math.min(lines.size(), 4); i++)
+                    //    nbt.put("Text" + (i + 1), "{\"text\":\"" + lines.get(i) + "\"}");
+                    //nbt.put("Text" + (i + 1), "{\"extra\":[{\"text\":\"" + lines.get(i) + "\"}],\"text\":\"\"}");
 
                     nbt.put("x", signLocation.getX());
                     nbt.put("y", signLocation.getY());
@@ -279,11 +272,96 @@ public class Module extends BukkitRunnable {
                     packet.getIntegers().write(0, 9);
                     packet.getNbtModifier().write(0, nbt);
 
+                    if(pos2 == -1) {
+                        VirtusCore.console().sendMessage("Loading sign: " + pos2);
+                        List<String> lines;
+                        if (fileManager.getConfiguration("signs").contains(placeholder + "." + pos2)) {
+                            lines = fileManager.getConfiguration("signs").getStringList(placeholder + "." + pos2 + ".lines");
+                        } else {
+                            lines = fileManager.getConfiguration("signs").getStringList(placeholder + ".default.lines");
+                        }
 
-                    for(Player p : Bukkit.getOnlinePlayers()){
-                        try {
-                            protocolManager.sendServerPacket(p, packet);
-                        } catch (InvocationTargetException ignored) { }
+                        for (Player p : Bukkit.getOnlinePlayers()) {
+                            String playername = p.getName();
+
+                            double value = sorted.get(p.getUniqueId());
+                            String sValue = String.valueOf(value);
+                            if (type.equalsIgnoreCase("number")) {
+                                sValue = TextFormater.formatValue(format, value);
+                            } else if (type.equalsIgnoreCase("time")) {
+                                sValue = TextFormater.formatTime(value * 1000);
+                            }
+                            lines = TextUtils.formatList(lines, "{position}:" + pos2, "{value}:" + sValue, "{player}:" + playername);
+                            lines = TextUtils.colorFormatList(lines);
+
+                            for (int i = 0; i < Math.min(lines.size(), 4); i++)
+                                nbt.put("Text" + (i + 1), "{\"text\":\"" + lines.get(i) + "\"}");
+
+                            try {
+                                if (signLocation.getDistance(p.getLocation()) < 500) {
+                                    protocolManager.sendServerPacket(p, packet);
+                                }
+                            } catch (InvocationTargetException ignored) {
+                            }
+
+                        }
+                    }else {
+
+
+                        List<String> lines;
+                        if (fileManager.getConfiguration("signs").contains(placeholder + "." + pos2)) {
+                            lines = fileManager.getConfiguration("signs").getStringList(placeholder + "." + pos2 + ".lines");
+                        } else {
+                            lines = fileManager.getConfiguration("signs").getStringList(placeholder + ".default.lines");
+                        }
+
+                        String playername;
+                        UUID id = getPlayer(position);
+                        if (id != null) {
+                            playername = Bukkit.getOfflinePlayer(id).getName();
+                        } else {
+                            playername = "###";
+                        }
+
+
+                        String value = String.valueOf(getValue(position));
+                        if (type.equalsIgnoreCase("number")) {
+                            value = TextFormater.formatValue(format, getValue(position));
+                        } else if (type.equalsIgnoreCase("time")) {
+                            value = TextFormater.formatTime(getValue(position) * 1000);
+                        }
+
+                        lines = TextUtils.formatList(lines, "{position}:" + pos2, "{value}:" + value, "{player}:" + playername);
+                        lines = TextUtils.colorFormatList(lines);
+
+
+                        /*PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.TILE_ENTITY_DATA);
+                        BlockPosition blockPosition = new BlockPosition(signLocation.getX(), signLocation.getY(), signLocation.getZ());
+                        packet.getBlockPositionModifier().write(0, blockPosition);
+
+                        NbtCompound nbt = (NbtCompound) packet.getNbtModifier().read(0);*/
+
+                        for (int i = 0; i < Math.min(lines.size(), 4); i++)
+                            nbt.put("Text" + (i + 1), "{\"text\":\"" + lines.get(i) + "\"}");
+                        //nbt.put("Text" + (i + 1), "{\"extra\":[{\"text\":\"" + lines.get(i) + "\"}],\"text\":\"\"}");
+
+                        /*nbt.put("x", signLocation.getX());
+                        nbt.put("y", signLocation.getY());
+                        nbt.put("z", signLocation.getZ());
+                        nbt.put("id", "minecraft:sign");
+
+                        packet.getIntegers().write(0, 9);
+                        packet.getNbtModifier().write(0, nbt);*/
+
+
+                        for (Player p : Bukkit.getOnlinePlayers()) {
+                            try {
+                                if (signLocation.getDistance(p.getLocation()) < 500) {
+                                    protocolManager.sendServerPacket(p, packet);
+                                }
+                            } catch (InvocationTargetException ignored) {
+                            }
+                        }
                     }
 
 
@@ -333,23 +411,29 @@ public class Module extends BukkitRunnable {
 
 
         if(doHeads){
-            for(SignLocation signLocation : heads.keySet()) {
-                World world = Bukkit.getWorld(signLocation.getWorld());
-                Block block = world.getBlockAt(signLocation.getX(), signLocation.getY(), signLocation.getZ());
+            Bukkit.getScheduler().runTask(plugin, new Runnable() {
+                @Override
+                public void run() {
+                    for(SignLocation signLocation : heads.keySet()) {
+                        World world = Bukkit.getWorld(signLocation.getWorld());
+                        Block block = world.getBlockAt(signLocation.getX(), signLocation.getY(), signLocation.getZ());
 
-                int position = heads.get(signLocation) - 1;
+                        int position = heads.get(signLocation) - 1;
 
-                if (block.getChunk().isLoaded()) {
-                    if (block.getState() instanceof Skull) {
-                        Skull skull = (Skull) block.getState();
-                        UUID id = getPlayer(position);
-                        if (id != null) {
-                            skull.setOwningPlayer(Bukkit.getOfflinePlayer(id));
+                        if (block.getChunk().isLoaded()) {
+                            if (block.getState() instanceof Skull) {
+                                Skull skull = (Skull) block.getState();
+                                UUID id = getPlayer(position);
+                                if (id != null) {
+                                    skull.setOwningPlayer(Bukkit.getOfflinePlayer(id));
+                                }
+                                skull.update();
+                            }
                         }
-                        skull.update();
                     }
                 }
-            }
+            });
+
         }
     }
 
@@ -414,7 +498,7 @@ public class Module extends BukkitRunnable {
                 public String update() {
                     UUID data = getPlayer(i);
                     if (data == null) {
-                        return "";
+                        return "###";
                     } else {
                         return Bukkit.getOfflinePlayer(data).getName();
                     }
